@@ -1,0 +1,29 @@
+export interface AppUser {
+	createDate?: Date;
+	id?: number;
+	name?: string;
+	firstName?: string;
+	lastName?: string;
+	mobile?: string;
+	mobileVerified?: boolean;
+	emailId?: string;
+	emailVerified?: boolean;
+	password?: string;
+	isActive?: boolean;
+	isAdmin?: boolean;
+	hasImpersonateAccess?: boolean;
+	photoAttachment?: string;
+	role?: string;
+	roleLabel?: string;
+	publish?: string;
+	publishLabel?: string;
+	importDataId?: number;
+	lastLogin?: Date;
+	defaultLanguage?: string;
+	updateDate?: Date;
+	deleteDate?: Date;
+	createById?: number;
+	updateById?: number;
+	deleteById?: number;
+	isDelete?: boolean;
+}

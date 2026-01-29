@@ -1,0 +1,35 @@
+export interface JobRequest {
+	id?: number;
+	name?: string;
+	firstName?: string;
+	lastName?: string;
+	mobile?: string;
+	emailId?: string;
+	dob?: Date;
+	gender?: string;
+	qualification?: string;
+	curCtc?: string;
+	expCtc?: string;
+	noticePeriod?: string;
+	designation?: string;
+	experience?: string;
+	currentWorkLocation?: string;
+	preferredLocation?: string;
+	employmentType?: string;
+	jobCategoryId?: string;
+	jobCategoryIdName?: string;
+	applyingPost?: string;
+	skillSet?: string;
+	howDidKnow?: string;
+	didKnowNiran?: string;
+	ifYes?: string;
+	fileDoc?: string;
+	isAccept?: boolean;
+	createDate?: Date;
+	updateDate?: Date;
+	deleteDate?: Date;
+	createById?: number;
+	updateById?: number;
+	deleteById?: number;
+	isDelete?: boolean;
+}

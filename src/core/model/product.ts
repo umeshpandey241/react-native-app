@@ -1,0 +1,29 @@
+export interface Product {
+	id?: number;
+	name?: string;
+	slug?: string;
+	image?: string;
+	mainContent?: string;
+	featureBenifit?: string;
+	specifiaction?: string;
+	industrieId?: string;
+	industrieIdName?: string;
+	importDataId?: number;
+	productId?: string;
+	productIdName?: string;
+	isActive?: boolean;
+	brochure?: string;
+	isParent?: boolean;
+	variantProductId?: string;
+	variantProductIdName?: string;
+	productFaqId?: string;
+	productFaqIdName?: string;
+	bannerImage?: string;
+	createDate?: Date;
+	updateDate?: Date;
+	deleteDate?: Date;
+	createById?: number;
+	updateById?: number;
+	deleteById?: number;
+	isDelete?: boolean;
+}

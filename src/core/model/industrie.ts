@@ -1,0 +1,29 @@
+export interface Industrie {
+	id?: number;
+	name?: string;
+	slug?: string;
+	image?: string;
+	mainContent?: string;
+	para2?: string;
+	para3?: string;
+	filtrationProcess?: string;
+	industrieType?: string;
+	industrieTypeLabel?: string;
+	importDataId?: number;
+	productId?: string;
+	productIdName?: string;
+	isActive?: boolean;
+	brochure?: string;
+	industriTestimonialId?: string;
+	industriTestimonialIdName?: string;
+	industriFaqId?: string;
+	industriFaqIdName?: string;
+	bannerImage?: string;
+	createDate?: Date;
+	updateDate?: Date;
+	deleteDate?: Date;
+	createById?: number;
+	updateById?: number;
+	deleteById?: number;
+	isDelete?: boolean;
+}

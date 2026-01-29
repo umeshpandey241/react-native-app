@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "724261643893",
+    "project_id": "webappzap-cae66",
+    "storage_bucket": "webappzap-cae66.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:724261643893:android:fe97766335058092f03a3c",
+        "android_client_info": {
+          "package_name": "in.app.wazl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "724261643893-21rpocifh98aat7ejr8boaf3p400fgl2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.app.wazl",
+            "certificate_hash": "1e54c8a0b06338c0c37fd6a43151618c4c5e4e8f"
+          }
+        },
+        {
+          "client_id": "724261643893-5g9frceg5n8j10kir02mvgn3kijp8q7u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.app.wazl",
+            "certificate_hash": "d2ebb3eb887ff7b122a523144b07a47310c16794"
+          }
+        },
+        {
+          "client_id": "724261643893-jbi2kma36g1odn8eofj53n4qtjkth56f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.app.wazl",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "724261643893-ecgnuuckuqtl0u5le1nqicuubo0c3ve0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9ens4STOcLE1YjFmFDbuMLY-jhQAcmgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "724261643893-ecgnuuckuqtl0u5le1nqicuubo0c3ve0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "724261643893-giiejtduqh04kuq5phepdhvmknjpq65g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "in.app.wazl"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
