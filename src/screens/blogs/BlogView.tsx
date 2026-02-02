@@ -13,7 +13,6 @@ import {
   Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {get} from 'http';
 
 const {width} = Dimensions.get('window');
 const isTablet = width >= 768;
@@ -62,7 +61,7 @@ const BlogView = ({route}) => {
   useEffect(() => {
     const fetchById = async () => {
       const fetchByIdData = await getById({id, slug});
-      console.log(fetchByIdData, 'fetchByIdData');
+      // console.log(fetchByIdData, 'fetchByIdData');
       setItem(fetchByIdData);
     };
     fetchById();

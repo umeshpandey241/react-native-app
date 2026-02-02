@@ -11,6 +11,8 @@ import {getGlobalSearchData} from '../../core/service/homes.service';
 import {Product} from '../../core/model/product';
 import {Blog} from '../../core/model/blog';
 import {Industrie} from '../../core/model/industrie';
+import {getPhotoUrl} from '../product/ProductList';
+import {useNavigation} from '@react-navigation/native';
 
 interface globalSearchData {
   product: Product[];
@@ -23,6 +25,9 @@ const Search = ({route}) => {
   const [searchData, setSearchData] = useState<globalSearchData>({});
   const [globalSearchData, setGlobalSearchData] =
     useState<globalSearchData>(searchData);
+  const navigation = useNavigation();
+
+  // const imageUrl = console.log(globalSearchData, 'global');
 
   useEffect(() => {
     const fetchSearchData = async () => {
@@ -60,32 +65,40 @@ const Search = ({route}) => {
               Products ({globalSearchData.product.length})
             </Text>
 
-            {globalSearchData.product.map((product: any) => (
-              <View key={product.slug} style={styles.card}>
-                <View style={styles.imageWrapper}>
-                  {product.image && (
-                    <Image
-                      source={{uri: product.image}}
-                      style={styles.image}
-                      resizeMode="contain"
-                    />
-                  )}
-                </View>
+            {globalSearchData.product.map((product: any) => {
+              const mainImageUrl = getPhotoUrl(product.image);
+              return (
+                <View key={product.slug} style={styles.card}>
+                  <View style={styles.imageWrapper}>
+                    {product.image && (
+                      <Image
+                        source={{uri: mainImageUrl}}
+                        style={styles.image}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
 
-                <View style={styles.content}>
-                  <Text style={styles.cardTitle}>{product.name}</Text>
-                  <Text style={styles.description} numberOfLines={2}>
-                    {product.mainContent}
-                  </Text>
+                  <View style={styles.content}>
+                    <Text style={styles.cardTitle}>{product.name}</Text>
+                    <Text style={styles.description} numberOfLines={2}>
+                      {product.mainContent}
+                    </Text>
 
-                  <TouchableOpacity
-                    // onPress={() => navigation.navigate('ProductDetails', { slug: product.slug })}
-                    style={styles.linkBtn}>
-                    <Text style={styles.linkText}>View Details →</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ProductView', {
+                          slug: product.slug,
+                          id: product.id,
+                        })
+                      }
+                      style={styles.linkBtn}>
+                      <Text style={styles.linkText}>View Details →</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
@@ -96,30 +109,40 @@ const Search = ({route}) => {
               Industry ({globalSearchData.industrie.length})
             </Text>
 
-            {globalSearchData.industrie.map((industrie: any) => (
-              <View key={industrie.slug} style={styles.card}>
-                <View style={styles.imageWrapper}>
-                  {industrie.image && (
-                    <Image
-                      source={{uri: industrie.image}}
-                      style={styles.image}
-                      resizeMode="contain"
-                    />
-                  )}
-                </View>
+            {globalSearchData.industrie.map((industrie: any) => {
+              const mainImageUrl = getPhotoUrl(industrie.image);
+              return (
+                <View key={industrie.slug} style={styles.card}>
+                  <View style={styles.imageWrapper}>
+                    {industrie.image && (
+                      <Image
+                        source={{uri: mainImageUrl}}
+                        style={styles.image}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
 
-                <View style={styles.content}>
-                  <Text style={styles.cardTitle}>{industrie.name}</Text>
-                  <Text style={styles.description} numberOfLines={2}>
-                    {industrie.mainContent}
-                  </Text>
+                  <View style={styles.content}>
+                    <Text style={styles.cardTitle}>{industrie.name}</Text>
+                    <Text style={styles.description} numberOfLines={2}>
+                      {industrie.mainContent}
+                    </Text>
 
-                  <TouchableOpacity style={styles.linkBtn}>
-                    <Text style={styles.linkText}>View Details →</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.linkBtn}
+                      onPress={() =>
+                        navigation.navigate('IndustriesView', {
+                          slug: industrie.slug,
+                          id: industrie.id,
+                        })
+                      }>
+                      <Text style={styles.linkText}>View Details →</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
@@ -130,32 +153,42 @@ const Search = ({route}) => {
               Blog ({globalSearchData.blog.length})
             </Text>
 
-            {globalSearchData.blog.map((blog: any) => (
-              <View key={blog.slug} style={styles.card}>
-                <View style={styles.imageWrapper}>
-                  {blog.image && (
-                    <Image
-                      source={{uri: blog.image}}
-                      style={styles.image}
-                      resizeMode="contain"
-                    />
-                  )}
+            {globalSearchData.blog.map((blog: any) => {
+              const mainImageUrl = getPhotoUrl(blog.image);
+              return (
+                <View key={blog.slug} style={styles.card}>
+                  <View style={styles.imageWrapper}>
+                    {blog.image && (
+                      <Image
+                        source={{uri: mainImageUrl}}
+                        style={styles.image}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
+
+                  <View style={styles.content}>
+                    <Text style={styles.cardTitle}>{blog.name}</Text>
+
+                    {/* HTML stripped → plain text */}
+                    <Text style={styles.description} numberOfLines={2}>
+                      {blog.shortDescription?.replace(/<[^>]*>?/gm, '')}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={styles.linkBtn}
+                      onPress={() =>
+                        navigation.navigate('BlogView', {
+                          slug: blog.slug,
+                          id: blog.id,
+                        })
+                      }>
+                      <Text style={styles.linkText}>View Details →</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-
-                <View style={styles.content}>
-                  <Text style={styles.cardTitle}>{blog.name}</Text>
-
-                  {/* HTML stripped → plain text */}
-                  <Text style={styles.description} numberOfLines={2}>
-                    {blog.shortDescription?.replace(/<[^>]*>?/gm, '')}
-                  </Text>
-
-                  <TouchableOpacity style={styles.linkBtn}>
-                    <Text style={styles.linkText}>View Details →</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
       </View>

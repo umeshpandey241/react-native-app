@@ -1,20 +1,17 @@
-import {Industrie} from '@/core/model/industrie';
-import {CustomFile} from '@/core/model/customfile';
-// import {getAuthHeaders} from '@/lib/getHeaders'
-import {useLanguageStore} from '@/store/useLanguage.store';
+import {Industrie} from '../../core/model/industrie';
+import {CustomFile} from '../../core/model/customfile';
 import {BASE_URL} from '../../../config/config';
 
-const getAll = async (token?: string | unknown, language?: string) => {
+const getAll = async () => {
   const payload = {
     form: null,
     condition: null,
   };
 
   try {
-    // const headers = await getAuthHeaders(token, language || useLanguageStore.getState().selectedLanguage);
     const response = await fetch(`${BASE_URL}/Industrie/Get`, {
       method: 'POST',
-      // headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -29,29 +26,16 @@ const getAll = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getById = async (
-  {id, slug}: {id: string; slug?: string | null},
-  token?: string | unknown,
-  language?: string,
-) => {
+const getById = async ({id, slug}: {id: string; slug?: string | null}) => {
   const payload = {
     id: Number(id),
     slug: slug ?? null,
   };
-  let headers = getAuthHeaders(token);
-  if (token) {
-    const {...rest} = headers;
-    headers = rest;
-  }
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Industrie/GetById`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -66,23 +50,11 @@ const getById = async (
   }
 };
 
-const draft = async (
-  payload: Industrie,
-  token?: string | unknown,
-  language?: string,
-) => {
-  // const payload = {
-  //     "id": industrieID
-  // }
-
+const draft = async (payload: Industrie) => {
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/Draft`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -97,19 +69,11 @@ const draft = async (
   }
 };
 
-const add = async (
-  payload: Industrie,
-  token?: string | unknown,
-  language?: string,
-) => {
+const add = async (payload: Industrie) => {
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/Add`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -125,19 +89,11 @@ const add = async (
   }
 };
 
-const update = async (
-  payload: Industrie,
-  token?: string | unknown,
-  language?: string,
-) => {
+const update = async (payload: Industrie) => {
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/Update`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -153,23 +109,15 @@ const update = async (
   }
 };
 
-const deleteData = async (
-  userId: string,
-  token?: string | unknown,
-  language?: string,
-) => {
+const deleteData = async (userId: string) => {
   const payload = {
     Id: userId,
   };
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/Delete`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -185,30 +133,14 @@ const deleteData = async (
   }
 };
 
-const fileUpload = async (
-  file: File,
-  token?: string | unknown,
-  language?: string,
-): Promise<CustomFile> => {
+const fileUpload = async (file: File): Promise<CustomFile> => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    // const headers = getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
-
-    // if (headers['Content-Type']) {
-    //   delete headers['Content-Type'];
-    // }
-
     const response = await fetch(`${BASE_URL}/Industrie/FileUpload`, {
       method: 'POST',
-      // headers: {
-      //     Authorization: `Bearer ${token}`,
-      // },
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: formData,
     });
     if (!response.ok) {
@@ -234,19 +166,11 @@ export interface FileInfo {
   filePath: string;
 }
 
-const fileDownload = async (
-  fileInfo: FileInfo,
-  token?: string | unknown,
-  language?: string,
-): Promise<Blob> => {
+const fileDownload = async (fileInfo: FileInfo): Promise<Blob> => {
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/Download`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(fileInfo),
     });
 
@@ -260,10 +184,7 @@ const fileDownload = async (
   }
 };
 
-const getHomeCommonData = async (
-  token?: string | unknown,
-  language?: string,
-) => {
+const getHomeCommonData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -271,13 +192,9 @@ const getHomeCommonData = async (
   };
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/GetHomeCommonData`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -291,7 +208,7 @@ const getHomeCommonData = async (
   }
 };
 
-const getHtmlData = async (token?: string | unknown, language?: string) => {
+const getHtmlData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -300,13 +217,9 @@ const getHtmlData = async (token?: string | unknown, language?: string) => {
   };
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/GetHtmlData`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -320,7 +233,7 @@ const getHtmlData = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getHomeUserData = async (token?: string | unknown, language?: string) => {
+const getHomeUserData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -328,13 +241,9 @@ const getHomeUserData = async (token?: string | unknown, language?: string) => {
   };
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/GetHomeUserData`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -348,19 +257,15 @@ const getHomeUserData = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const deleteUser = async (token?: string | unknown, language?: string) => {
+const deleteUser = async () => {
   const payload = {
     id: 0,
   };
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/DeleteUser`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -384,30 +289,22 @@ const deleteUser = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getIndustrieData = async (
-  {id, slug}: {id: string; slug?: string | null},
-  token?: string | unknown,
-  language?: string,
-) => {
+const getIndustrieData = async ({
+  // id,
+  slug,
+}: {
+  id: string;
+  slug?: string | null;
+}) => {
   const payload = {
     slug: slug ?? null,
     id: 0,
   };
 
-  //   let headers = getAuthHeaders(token);
-  //   if (token) {
-  //     const {...rest} = headers;
-  //     headers = rest;
-  //   }
-
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(`${BASE_URL}/Industrie/GetIndustrieData`, {
       method: 'POST',
-      //   headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -422,11 +319,7 @@ const getIndustrieData = async (
   }
 };
 
-const getIndustryByProductId = async (
-  // token?: string | unknown,
-  // language?: string,
-  productId?: number,
-) => {
+const getIndustryByProductId = async (productId?: number) => {
   const payload = {
     ProductId: productId,
     id: 0,
@@ -435,15 +328,11 @@ const getIndustryByProductId = async (
   console.log(payload, 'payload');
 
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
     const response = await fetch(
       `${BASE_URL}/Industrie/GetIndustryByProductId`,
       {
         method: 'POST',
-        // headers,
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload),
       },
     );

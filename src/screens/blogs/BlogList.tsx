@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Blog} from '@/core/model/blog';
+import {Blog} from '../../core/model/blog';
 import {getAll} from '../../core/service/blogs.service';
 import {getBlogData} from '../../core/service/blogCategories.service';
 import Header from '../../components/Header';
@@ -50,7 +50,7 @@ export default function BlogList() {
   useEffect(() => {
     const fetchBlogCategories = async () => {
       const fetchBlogCategoriesData = await getBlogData();
-      console.log(fetchBlogCategoriesData, 'blogCategoriesData');
+      // console.log(fetchBlogCategoriesData, 'blogCategoriesData');
       setBlogCategoriesData(fetchBlogCategoriesData);
     };
     fetchBlogCategories();

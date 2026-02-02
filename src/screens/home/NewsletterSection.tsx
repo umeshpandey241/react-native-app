@@ -24,6 +24,7 @@ export default function NewsletterSection() {
   const [formData, setFormData] = useState<Subscriber>(initialFormState);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const contactSchema = subscriberValidate((key: string) => key);
   // const [addData, setAddData] = useState([]);
 
   // useEffect(() => {
@@ -34,41 +35,80 @@ export default function NewsletterSection() {
   //   adding();
   // });
 
-  const contactSchema = subscriberValidate((key: string) => key);
-
-  const handleChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({...prev, [field]: value}));
-
     const schema = contactSchema[field as keyof typeof contactSchema];
-    if (!schema) return;
 
-    const result = schema.safeParse(value);
-    setErrors(prev => ({
-      ...prev,
-      [field]: result.success ? '' : result.error.errors[0].message,
-    }));
+    if (schema) {
+      const result = schema.safeParse(value);
+      if (result.success) {
+        setErrors(prev => ({...prev, [field]: ''}));
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          [field]: result.error.errors[0].message,
+        }));
+      }
+    }
+  };
+
+  const removeEmptyFields = <T extends object>(obj: T): Partial<T> => {
+    return Object.keys(obj).reduce((acc, key) => {
+      const value = obj[key as keyof T];
+      if (value !== '' && value !== undefined && value !== null) {
+        acc[key as keyof T] = value;
+      }
+      return acc;
+    }, {} as Partial<T>);
   };
 
   const handleSubmit = async () => {
-    if (isSubmitting) return;
+    let hasError = false;
+    const newErrors: Record<string, string> = {};
 
-    const schema = contactSchema.email.safeParse(formData.email);
-    if (!schema.success) {
-      setErrors({email: schema.error.errors[0].message});
+    Object.keys(formData).forEach(field => {
+      const value = formData[field as keyof typeof formData];
+      const schema = contactSchema[field as keyof typeof contactSchema];
+
+      if (schema) {
+        const result = schema.safeParse(value);
+        if (!result.success) {
+          newErrors[field] = result.error.errors[0].message;
+          hasError = true;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => {
+        setErrors({});
+      }, 2000);
+    }
+
+    if (hasError) {
       return;
     }
 
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      await addData({email: formData.email});
-      Alert.alert(
-        'Subscribed',
-        "Thank you for subscribing. We'll keep you updated.",
-      );
+      const payload: Subscriber = {
+        email: formData.email,
+      };
+
+      const cleanedPayload = removeEmptyFields(payload);
+      await addData(cleanedPayload);
+
+      console.log("Thank you for subscribing. We'll keep you updated");
       setFormData(initialFormState);
-    } catch (err) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      // setTimeout(() => {
+      //     router.push("/");
+      // }, 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -131,7 +171,7 @@ export default function NewsletterSection() {
                 placeholder="Enter your email address"
                 placeholderTextColor="#cbd5e1"
                 value={formData.email}
-                onChangeText={v => handleChange('email', v)}
+                onChangeText={v => handleInputChange('email', v)}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 style={styles.input}

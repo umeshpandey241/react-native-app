@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 
 // import strengths from '@/assets/images/strengths.webp';
 // import LuFilter from '@/assets/images/Funnel.webp';

@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  Alert,
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
@@ -17,13 +18,14 @@ import {
   selectDropdownEnum,
   selectRadioEnum,
 } from '../../sharedBase/dropdownUtils';
-import {add as addData} from '../../core/service/subscribers.service';
+import {add as addData} from '../../core/service/jobRequests.service';
 import {CustomDropdown} from '../../components/CustomDropdown';
 import {JobCategory} from '../../core/model/jobCategory';
 import {JobVacancy} from '../../core/model/jobVacancy';
 import {getAll} from '../../core/service/jobVacancies.service';
 import FileUploadMain from '../../components/FileUploadMain';
 import {parseISO, format} from 'date-fns';
+import {EnumDetail} from '../../core/model/enumDetail';
 
 function initialFormState(): JobRequest {
   return {
@@ -84,6 +86,7 @@ function JobRequestForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [jobVacancylist, setJobVacancyList] = useState<JobVacancy[]>([]);
   const [showErrors, setShowErrors] = useState(false);
+  console.log(showErrors);
   const [jobCategoryIdlist, setJobCategoryList] = useState<JobCategory[]>([]);
   const [selectedJobCategory, setSelectedJobCategory] = useState<string | null>(
     null,
@@ -95,26 +98,34 @@ function JobRequestForm({
     JobVacancy[]
   >([]);
 
+  const [fileUploadValidation, setFileUploadValidation] = useState<
+    Record<string, {isValid: boolean; error?: string}>
+  >({});
+
   const [jobVacancys, setJobVacancys] = useState<JobVacancy>([]);
   const inputRefs = useRef<{name: string; required: boolean}[]>([]);
 
   console.log(errors, 'errors');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const listGender = [
     {id: 1, value: 'Male'},
     {id: 2, value: 'Female'},
   ];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const listMember = [
     {id: 1, value: 'Yes'},
     {id: 2, value: 'No'},
   ];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const listEmployementType = [
     {id: 1, value: 'Fresher'},
     {id: 2, value: 'Experienced'},
   ];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const listhowDidKnow = [
     {id: 1, value: 'Friend'},
     {id: 2, value: 'Relatives'},
@@ -127,17 +138,46 @@ function JobRequestForm({
   useEffect(() => {
     const fetchjob = async () => {
       const fetchjobData = await getAll();
-      console.log(fetchjobData, 'fetchjob');
       setJobVacancys(fetchjobData);
     };
     fetchjob();
   });
 
   useEffect(() => {
+    if (listEmployementType.length && !formData.employmentType) {
+      setFormData(prev => ({
+        ...prev,
+        employmentType: listEmployementType[0].value,
+      }));
+    }
+  }, [formData.employmentType, listEmployementType]);
+
+  useEffect(() => {
+    if (listMember.length && !formData.howDidKnow) {
+      setFormData(prev => ({...prev, howDidKnow: listMember[0].value}));
+    }
+  }, [formData.howDidKnow, listMember]);
+
+  useEffect(() => {
+    if (listGender.length && !formData.gender) {
+      setFormData(prev => ({...prev, gender: listGender[0].value}));
+    }
+  }, [formData.gender, listGender]);
+
+  useEffect(() => {
+    if (listhowDidKnow.length && !formData.didKnowNiran) {
+      setFormData(prev => ({
+        ...prev,
+        didKnowNiran: listhowDidKnow[0].value,
+      }));
+    }
+  }, [formData.didKnowNiran, listhowDidKnow]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const listJobCategory = jobVacancys;
-        const options = listJobCategory.map((item: JobCategory) => ({
+        const options = listJobCategory?.map((item: JobCategory) => ({
           ...item,
           id: item.id?.toString(),
         }));
@@ -200,14 +240,12 @@ function JobRequestForm({
         value === undefined ||
         (Array.isArray(value) && value.length === 0);
 
-      // Required field
       if (required && isEmpty) {
         newErrors[name] = 'This field is required';
         hasError = true;
         return;
       }
 
-      // Schema validation (only if value exists)
       if (schema && !isEmpty) {
         const result = schema.safeParse(value);
         if (!result.success) {
@@ -217,11 +255,16 @@ function JobRequestForm({
         }
       }
 
-      // Clear error if valid
       newErrors[name] = '';
     });
 
-    // 2️⃣ Validate touched fields (live validation support)
+    Object.entries(fileUploadValidation).forEach(([fieldName, validation]) => {
+      if (!validation.isValid) {
+        newErrors[fieldName] = validation.error || 'File validation failed';
+        hasError = true;
+      }
+    });
+
     // Object.entries(touchedFields).forEach(([name, touched]) => {
     //   if (!touched) return;
 
@@ -244,7 +287,6 @@ function JobRequestForm({
     //   }
     // });
 
-    // // 3️⃣ File upload validation
     // Object.entries(fileUploadValidation).forEach(([fieldName, validation]) => {
     //   if (!validation.isValid) {
     //     newErrors[fieldName] = validation.error || 'File validation failed';
@@ -294,29 +336,22 @@ function JobRequestForm({
         howDidKnow: formData.howDidKnow,
         didKnowNiran: formData.didKnowNiran,
         ifYes: formData.ifYes,
-        // fileDoc: formData.fileDoc,
+        fileDoc: formData.fileDoc,
         isAccept: formData.isAccept,
       };
-
-      if (formData.fileDoc) {
-        payload.append('fileDoc', {
-          uri: formData.fileDoc.uri,
-          name: formData.fileDoc.name,
-          type: formData.fileDoc.type,
-        } as any);
-      }
 
       console.log('payload', payload);
       const cleanedPayload = removeEmptyFields(payload);
       console.log('cleanedPayload', cleanedPayload);
       await addData(cleanedPayload);
-      console.log('Your request has been submitted successfully');
+      Alert.alert('Your request has been submitted successfully');
       setFormData(initialFormState);
       setRequestFormOpen(false);
     } catch (error) {
       // if (process.env.NODE_ENV !== 'production') {
       //   console.error(error);
       // }
+      Alert.alert('Error submitting form. Please try again later.');
       console.error('Error submitting form. Please try again later.');
     } finally {
       setIsSubmitting(false);
@@ -420,19 +455,11 @@ function JobRequestForm({
   };
 
   const handleFileUpload = (newFiles: CustomFile[], inputName: string) => {
-    if (!newFiles || !newFiles.length) return;
-
-    setFormData(prev => ({
-      ...prev,
-      [inputName]: newFiles[0],
-    }));
-
-    setErrors(prev => ({
-      ...prev,
-      [inputName]: '',
+    setFormData(prevData => ({
+      ...prevData,
+      [inputName]: JSON.stringify(newFiles),
     }));
   };
-
   const registerInput = (name: string, required = false) => {
     const exists = inputRefs.current.find(input => input.name === name);
 
@@ -530,34 +557,61 @@ function JobRequestForm({
 
           {/* dob */}
           <View style={styles.field}>
-            <Text style={styles.label}>
-              Date of Birth <Text style={styles.required}>*</Text>
-            </Text>
-
+            <Text style={styles.label}>Dob</Text>
             <TouchableOpacity
-              style={[styles.input, showPicker && styles.focused]}
-              onPress={() => setShowPicker(true)}
-              activeOpacity={0.8}>
-              <Text style={formData.dob ? styles.text : styles.placeholder}>
-                {formData.dob ? formatDate(formData.dob) : 'Pick a date'}
-              </Text>
+              activeOpacity={1}
+              onPress={() => setShowPicker(!showPicker)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                borderWidth: 1,
+                borderRadius: 5,
+                backgroundColor: 'red',
+                // borderColor: theme.border,
+                padding: 6,
+                marginBottom: 10,
+                marginTop: 10,
+              }}>
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: '#111',
+                  // fontSize: getFontSize(12),
+                  fontFamily: 'Poppins-Regular',
+                }}
+                value={formData.dob ? formatDate(new Date(formData.dob)) : ''}
+                placeholder="Birth Date"
+                // placeholderTextColor={styles.placeholderText.color}
+                editable={false}
+                pointerEvents="none"
+              />
+
+              {/* <MaterialCommunityIcons
+                name={showCalendar ? 'close' : 'calendar'}
+                size={22}
+                color={theme.primary}
+                style={styles.calendar}
+              /> */}
             </TouchableOpacity>
 
-            <DatePicker
-              ref={ref => ref && registerInput('dob', true)}
-              modal
-              open={showPicker}
-              date={formData.dob ?? new Date(2000, 0, 1)}
-              mode="date"
-              maximumDate={new Date()}
-              onConfirm={date => {
-                setShowPicker(false);
-                setFormData(prev => ({...prev, dob: date}));
-              }}
-              onCancel={() => setShowPicker(false)}
-            />
+            {showPicker && (
+              <DatePicker
+                modal
+                mode="date"
+                open={showPicker}
+                date={formData.dob ? new Date(formData.dob) : new Date()}
+                onConfirm={(date: Date) => {
+                  setShowPicker(false);
 
-            {/* Error */}
+                  setFormData({
+                    ...formData,
+                    dob: date.toISOString(),
+                  });
+                }}
+                onCancel={() => setShowPicker(false)}
+              />
+            )}
+
             <FormFieldError field="dob" errors={errors} />
           </View>
 
@@ -811,7 +865,7 @@ function JobRequestForm({
               <Text style={styles.required}> *</Text>
             </Text>
 
-            <CustomDropdown
+            <CustomDropdown<EnumDetail>
               // ref={ref => ref && registerInput('jobCategoryId', true)}
               options={jobCategoryIdlist}
               selectedValue={selectedJobCategory}
@@ -831,7 +885,7 @@ function JobRequestForm({
               <Text style={styles.required}> *</Text>
             </Text>
 
-            <CustomDropdown
+            <CustomDropdown<EnumDetail>
               // ref={ref => ref && registerInput('applyingPost', true)}
               options={filteredJobVacancies}
               selectedValue={selectedJobVacancy}
@@ -957,14 +1011,12 @@ function JobRequestForm({
               existingFiles={formData.fileDoc ? [formData.fileDoc] : []}
               error={errors.fileDoc}
               onFileUpload={files => {
-                if (files?.length) {
-                  handleFileUpload(files[0], 'fileDoc');
-                }
+                handleFileUpload(files, 'fileDoc');
               }}
               onValidationChange={(isValid, error) => {
-                setErrors(prev => ({
+                setFileUploadValidation(prev => ({
                   ...prev,
-                  fileDoc: isValid ? '' : error || 'Invalid file',
+                  fileDoc: {isValid, error},
                 }));
               }}
             />

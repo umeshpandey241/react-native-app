@@ -316,7 +316,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                     ]}>
                     <View style={{flexDirection: 'row'}}>
                       <MaterialCommunityIcons
-                        name="home-outline"
+                        name="home"
                         size={24}
                         style={styles.primaryColor}
                       />
@@ -334,7 +334,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                     ]}>
                     <View style={{flexDirection: 'row'}}>
                       <MaterialCommunityIcons
-                        name="account-outline"
+                        name="account"
                         size={24}
                         style={styles.primaryColor}
                       />
@@ -396,7 +396,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                     ]}>
                     <View style={{flexDirection: 'row'}}>
                       <MaterialCommunityIcons
-                        name="star-outline"
+                        name="factory"
                         size={24}
                         style={styles.primaryColor}
                       />
@@ -518,7 +518,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                   {/* Contact Us Button */}
                   <TouchableOpacity
                     onPress={() =>
-                      handleNavigationWithActive('Contacts', 'Contact')
+                      handleNavigationWithActive('ContactsHome', 'Contact')
                     }
                     style={styles.actionButton}>
                     <MaterialCommunityIcons
@@ -591,7 +591,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                   </View>
                 </Collapsible> */}
                 </View>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => handleButtonPress('logout', handleLogout)}
                   style={[
                     styles.menu,
@@ -606,7 +606,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                     />
                     <Text style={styles.menuItem}>{t('globals.logout')}</Text>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </Animated.View>
             </TouchableWithoutFeedback>
           </View>

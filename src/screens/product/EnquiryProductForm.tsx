@@ -3,6 +3,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  Alert,
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
@@ -13,18 +14,9 @@ import {useTranslation} from 'react-i18next';
 import {CustomDropdown} from '../../components/CustomDropdown';
 import {Product} from '../../core/model/product';
 import {Industrie} from '../../core/model/industrie';
-// import {EnumDetail} from '../core/model/enumDetail';
-import CustomMultiSelect from '../../components/CustomMultiSelect';
-import {getProductByIndustryId} from '../../core/service/products.service';
 import {add as addData} from '../../core/service/enquiries.service';
-import {
-  selectDropdownEnum,
-  selectMultiData,
-} from '../../sharedBase/dropdownUtils';
+import {selectDropdownEnum} from '../../sharedBase/dropdownUtils';
 import FormFieldError from '../../components/FormFieldError';
-import {useNavigation} from '@react-navigation/native';
-import {BASE_URL} from '../../../config/config';
-
 function initialFormState(): Enquiry {
   return {
     id: undefined,
@@ -56,8 +48,8 @@ function EnquiryProductForm({
   setEnquiryFormOpen,
   products,
   industries,
-  loadingData,
-}: {
+}: // loadingData,
+{
   setEnquiryFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
   products: Product[];
   industries: Industrie[];
@@ -202,11 +194,12 @@ function EnquiryProductForm({
 
       await addData(cleanedPayload);
 
-      console.log('Your request has been submitted successfully');
+      Alert.alert('Your request has been submitted successfully');
 
       setFormData(initialFormState());
       setEnquiryFormOpen(false);
     } catch (error) {
+      Alert.alert('Error submitting form');
       console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);

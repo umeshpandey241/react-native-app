@@ -1,23 +1,17 @@
-import {Enquiry} from '@/core/model/enquiry';
-import {CustomFile} from '@/core/model/customfile';
-import {getAuthHeaders} from '@/lib/getHeaders';
-import {useLanguageStore} from '@/store/useLanguage.store';
 import {BASE_URL} from '../../../config/config';
+import {CustomFile} from '../model/customfile';
+import {Enquiry} from '../model/enquiry';
 
-const getAll = async (token?: string | unknown, language?: string) => {
+const getAll = async () => {
   const payload = {
     form: null,
     condition: null,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/Get`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -32,23 +26,15 @@ const getAll = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getById = async (
-  enquiryID: string,
-  token?: string | unknown,
-  language?: string,
-) => {
+const getById = async (enquiryID: string) => {
   const payload = {
     id: enquiryID,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/GetById`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -63,23 +49,11 @@ const getById = async (
   }
 };
 
-const draft = async (
-  payload: Enquiry,
-  token?: string | unknown,
-  language?: string,
-) => {
-  // const payload = {
-  //     "id": enquiryID
-  // }
-
+const draft = async (payload: Enquiry) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/Draft`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -94,20 +68,11 @@ const draft = async (
   }
 };
 
-const add = async (
-  payload: Enquiry,
-  // token?: string | unknown,
-  // language?: string,
-) => {
+const add = async (payload: Enquiry) => {
   try {
-    // const headers = await getAuthHeaders(
-    //   token,
-    //   language || useLanguageStore.getState().selectedLanguage,
-    // );
-    // console.log('BASE', payload);
-    const response = await fetch(`${'https://api-niran.wazl.in'}/Enquiry/Add`, {
+    const response = await fetch(`${BASE_URL}/Enquiry/Add`, {
       method: 'POST',
-      // headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -121,19 +86,11 @@ const add = async (
   }
 };
 
-const update = async (
-  payload: Enquiry,
-  token?: string | unknown,
-  language?: string,
-) => {
+const update = async (payload: Enquiry) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/Update`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -149,23 +106,15 @@ const update = async (
   }
 };
 
-const deleteData = async (
-  userId: string,
-  token?: string | unknown,
-  language?: string,
-) => {
+const deleteData = async (userId: string) => {
   const payload = {
     Id: userId,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/Delete`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -181,36 +130,20 @@ const deleteData = async (
   }
 };
 
-const fileUpload = async (
-  file: File,
-  token?: string | unknown,
-  language?: string,
-): Promise<CustomFile> => {
+const fileUpload = async (file: File): Promise<CustomFile> => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const headers = getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
-
-    if (headers['Content-Type']) {
-      delete headers['Content-Type'];
-    }
-
     const response = await fetch(`${BASE_URL}/Enquiry/FileUpload`, {
       method: 'POST',
-      // headers: {
-      //     Authorization: `Bearer ${token}`,
-      // },
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: formData,
     });
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(
-        `Failed to upload file: ${response.status} - ${errorText}`,
+        ` Failed to upload file: ${response.status} - ${errorText}`,
       );
     }
 
@@ -230,19 +163,11 @@ export interface FileInfo {
   filePath: string;
 }
 
-const fileDownload = async (
-  fileInfo: FileInfo,
-  token?: string | unknown,
-  language?: string,
-): Promise<Blob> => {
+const fileDownload = async (fileInfo: FileInfo): Promise<Blob> => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/Download`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(fileInfo),
     });
 
@@ -256,10 +181,7 @@ const fileDownload = async (
   }
 };
 
-const getHomeCommonData = async (
-  token?: string | unknown,
-  language?: string,
-) => {
+const getHomeCommonData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -267,13 +189,9 @@ const getHomeCommonData = async (
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/GetHomeCommonData`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -287,7 +205,7 @@ const getHomeCommonData = async (
   }
 };
 
-const getHtmlData = async (token?: string | unknown, language?: string) => {
+const getHtmlData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -296,13 +214,9 @@ const getHtmlData = async (token?: string | unknown, language?: string) => {
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/GetHtmlData`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -316,7 +230,7 @@ const getHtmlData = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getHomeUserData = async (token?: string | unknown, language?: string) => {
+const getHomeUserData = async () => {
   const payload = {
     type: 'default',
     pageType: 'admin',
@@ -324,13 +238,9 @@ const getHomeUserData = async (token?: string | unknown, language?: string) => {
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/GetHomeUserData`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -344,29 +254,23 @@ const getHomeUserData = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const deleteUser = async (token?: string | unknown, language?: string) => {
+const deleteUser = async () => {
   const payload = {
     id: 0,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Enquiry/DeleteUser`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
-
-    const contentType = response.headers.get('content-type');
 
     if (!response.ok) {
       const text = await response.text();
       throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
     }
-
+    const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json();
       return data;

@@ -132,7 +132,7 @@ const EventDatasList = () => {
         <View style={styles.searchRow}>
           <TextInput
             value={search}
-            onChangeText={e => setSearch(e.target.value)}
+            onChangeText={e => setSearch(e)}
             placeholder="Search Event..."
             style={styles.searchInput}
           />

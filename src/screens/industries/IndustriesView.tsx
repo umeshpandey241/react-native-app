@@ -14,7 +14,7 @@ import {
   Modal,
   TouchableOpacity,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, {useEffect, useMemo, useState} from 'react';
 import {getAll, getIndustrieData} from '../../core/service/industries.service';
 import {Blog} from '../../core/model/blog';
@@ -28,6 +28,7 @@ import IndustriesCard from './IndustriesCard';
 import BlogCard from '../blogs/BlogCard';
 import TestimonialSection from '../home/TestimonialSection';
 import EnquiryIndustrieForm from './EnquiryIndustrieForm';
+import RNFS from 'react-native-fs';
 
 const parseAndFormatImages = (imageData: string | null) => {
   if (!imageData) return [];
@@ -74,12 +75,17 @@ const IndustriesView = ({route}) => {
   const [industriesData, setIndustriesData] = React.useState<industrieData[]>(
     [],
   );
+  const industrie = industriesData?.industrie?.[0] ?? null;
+  const [uploadedFiles, setUploadedFiles] = useState<CustomFile[]>(
+    parseAndFormatImages(industrie?.brochure ?? null),
+  );
   const [industriesRelatedIndustrieData, setIndustriesRelatedIndustrieData] =
     useState<industrieData | null>(null);
 
   const [selectedImage, setSelectedImage] = useState<string | undefined>();
   const [enquiryFormOpen, setEnquiryFormOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  console.log(setLoadingData);
 
   // const industrie = industriesData[0] ?? null;
   const industry = useMemo(() => {
@@ -131,6 +137,10 @@ const IndustriesView = ({route}) => {
   useEffect(() => {
     setSelectedImage(mainImageUrl);
   }, [mainImageUrl]);
+
+  useEffect(() => {
+    setUploadedFiles(parseAndFormatImages(industrie?.brochure ?? null));
+  }, [industrie]);
 
   const products = useMemo(() => {
     return Array.isArray(industriesRelatedIndustrieData?.product)
@@ -227,6 +237,20 @@ const IndustriesView = ({route}) => {
     setOpenId(prev => (prev === id ? null : id));
   };
 
+  const downloadFile = async (file: CustomFile) => {
+    try {
+      const response = await fileDownload(file);
+      if (!response) {
+        throw new Error('Download function returned no data');
+      }
+      const base64Data = Buffer.from(response).toString('base64');
+      const filePath = `${RNFS.DownloadDirectoryPath}/${file.fileName}`;
+      await RNFS.writeFile(filePath, base64Data, 'base64');
+      console.log('File downloaded at:', filePath);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
   const renderItem = ({item}: any) => {
     // const mainImageUrl = getPhotoUrl(item.image);
 
@@ -283,15 +307,15 @@ const IndustriesView = ({route}) => {
               </Pressable>
 
               {/* Download Brochure */}
-              {/* {uploadedFiles && uploadedFiles.length > 0 && (
-              // <Pressable
-              //   style={styles.downloadBtn}
-              //   onPress={() => onDownload?.(uploadedFiles[0])}>
-              <Pressable style={styles.downloadBtn}>
-                <Ionicons name="document-text" size={20} color="#E5252A" />
-                <Text style={styles.downloadText}>Download Brochure</Text>
-              </Pressable>
-            )} */}
+              {uploadedFiles && uploadedFiles.length > 0 && (
+                <Pressable
+                  style={styles.downloadBtn}
+                  onPress={() => downloadFile(uploadedFiles[0])}>
+                  {/* // <Pressable style={styles.downloadBtn}> */}
+                  <Ionicons name="document-text" size={20} color="#E5252A" />
+                  <Text style={styles.downloadText}>Download Brochure</Text>
+                </Pressable>
+              )}
             </View>
           </View>
 

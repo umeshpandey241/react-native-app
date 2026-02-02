@@ -1,11 +1,12 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
+  // Image,
   TouchableOpacity,
-  Dimensions,
+  // Dimensions,
 } from 'react-native';
 
 // import team from '@/assets/images/Teammeetinghoto.webp';
@@ -13,9 +14,10 @@ import {
 // import Presentation from '@/assets/images/PresentationChart.webp';
 // import Target from '@/assets/images/Target.webp';
 
-const {width} = Dimensions.get('window');
+// const {width} = Dimensions.get('window');
 
-export default function AboutSection({navigation}: any) {
+export default function AboutSection() {
+  const navigation = useNavigation();
   return (
     <View style={styles.section}>
       <View style={styles.container}>
@@ -67,7 +69,7 @@ export default function AboutSection({navigation}: any) {
 
           <TouchableOpacity
             style={styles.cta}
-            onPress={() => navigation.navigate('About')}>
+            onPress={() => navigation.navigate('AboutHomes')}>
             <Text style={styles.ctaText}>
               Niran - Powered by Science. Perfected by Technology.
             </Text>

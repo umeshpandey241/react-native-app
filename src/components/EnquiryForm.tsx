@@ -3,6 +3,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  Alert,
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
@@ -20,6 +21,7 @@ import {getProductByIndustryId} from '../core/service/products.service';
 import {add as addData} from '../core/service/enquiries.service';
 import {selectDropdownEnum, selectMultiData} from '../sharedBase/dropdownUtils';
 import {getAll} from '../core/service/enumDetails.service';
+import _ from 'lodash';
 
 function initialFormState(): Enquiry {
   return {
@@ -52,7 +54,6 @@ function EnquiryForm({
   setEnquiryFormOpen,
   products,
   industries,
-  loadingData,
 }: {
   setEnquiryFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
   products: Product[];
@@ -120,21 +121,53 @@ function EnquiryForm({
   }));
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const bindDropDownList = async () => {
-      const data = await getAll();
-      if (!Array.isArray(data) || data.length === 0) return;
+      try {
+        const data = await getAll();
+        if (!Array.isArray(data) || data.length === 0) return;
 
-      const copiedData = _.cloneDeep(data);
+        const copiedData = _.cloneDeep(data);
 
-      const filteredData = copiedData.filter(
-        (item: EnumDetail) => item.section === 'EnquiryType',
-      );
+        const sections = {
+          EnquiryType: {
+            setter: setEnquiryTypeData,
+            selected: formData.enquiryType,
+            setSelected: setSelectedEnquiryType,
+          },
+        };
 
-      setEnquiryTypeData(filteredData);
+        Object.entries(sections).forEach(
+          ([section, {setter, selected, setSelected}]) => {
+            const filteredData = copiedData.filter(
+              (item: EnumDetail) => item.section === section,
+            );
+
+            setter(filteredData);
+
+            if (section !== 'Gender') {
+              const selectedItem = filteredData.find(
+                (item: {value: string | undefined}) => item.value === selected,
+              );
+
+              if (selectedItem) {
+                setSelected(_.cloneDeep(selectedItem));
+              }
+            }
+          },
+        );
+      } catch (error) {
+        console.error('Error binding dropdown list:', error);
+      }
     };
 
-    bindDropDownList();
-  }, []); // ✅ RUN ONCE ONLY
+    timeoutId = setTimeout(bindDropDownList, 3000);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [formData.enquiryType]);
 
   const removeEmptyFields = <T extends object>(obj: T): Partial<T> => {
     return Object.keys(obj).reduce((acc, key) => {
@@ -201,13 +234,14 @@ function EnquiryForm({
       const cleanedPayload = removeEmptyFields(payload);
       console.log(cleanedPayload, 'cleanedPayload');
       await addData(cleanedPayload);
-      // toast.success('Your request has been submitted successfully');
+      Alert.alert('Your request has been submitted successfully');
       setFormData(initialFormState);
       setEnquiryFormOpen(false);
       // setTimeout(() => {
       //     router.push("/");
       // }, 2000);
     } catch (error) {
+      Alert.alert('Error submitting form');
       console.error('Error submitting form:', error);
       // toast.error('Error submitting form. Please try again later.');
     } finally {
@@ -232,26 +266,40 @@ function EnquiryForm({
     }
   };
 
-  const handleDropdownChange = (value: string, controlName: string) => {
+  const handleDropdownChange = (
+    value: string | number | null,
+    controlName: string,
+  ) => {
+    // normalize value
+    const normalizedValue =
+      value !== null && value !== undefined ? String(value) : '';
+
     const updatedFormData = selectDropdownEnum(
-      {value, target: {name: controlName}},
+      {value: normalizedValue, target: {name: controlName}},
       controlName,
       false,
       formData as Record<string, unknown>,
     );
+
     setFormData(updatedFormData as typeof formData);
 
     const schema = enquirySchema[controlName as keyof typeof enquirySchema];
-    if (schema) {
-      const result = schema.safeParse(value);
-      if (result.success) {
-        setErrors(prev => ({...prev, [controlName]: ''}));
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          [controlName]: result.error.errors[0].message,
-        }));
-      }
+    if (!schema) return;
+
+    // 🚀 instant error clear when value exists
+    if (normalizedValue) {
+      setErrors(prev => ({...prev, [controlName]: ''}));
+      return;
+    }
+
+    // fallback validation
+    const result = schema.safeParse(normalizedValue);
+
+    if (!result.success) {
+      setErrors(prev => ({
+        ...prev,
+        [controlName]: result.error.errors?.[0]?.message ?? 'Invalid value',
+      }));
     }
   };
 
@@ -419,7 +467,6 @@ function EnquiryForm({
 
             {/* Dropdown */}
             <CustomDropdown
-              ref={ref => ref && registerInput('enquiryType', true)}
               options={enquiryTypeData}
               selectedValue={selectedEnquiryType}
               setSelectedValue={setSelectedEnquiryType}
@@ -476,7 +523,6 @@ function EnquiryForm({
               }}
               placeholder="Select Industry"
               controlName="industrieId"
-              loading={loadingData}
             />
 
             <FormFieldError field="industrieId" errors={errors} />
@@ -507,8 +553,8 @@ function EnquiryForm({
             <CustomMultiSelect
               options={productOptions}
               selectedValues={selectedProduct.map(u => u.id?.toString() ?? '')}
-              onChange={values => {
-                handleMultiSelectChange(
+              onChange={(values: string[]) => {
+                return handleMultiSelectChange(
                   values,
                   'productId',
                   productData,

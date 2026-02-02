@@ -5,6 +5,10 @@ import {
   ScrollView,
   Image,
   StyleSheet,
+  Modal,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
 import {CaseStudy} from '../../core/model/caseStudy';
@@ -13,8 +17,28 @@ import {TouchableOpacity} from 'react-native';
 import {getPhotoUrl} from '../product/ProductList';
 import {RenderHTML} from 'react-native-render-html';
 import Header from '../../components/Header';
+// import {CustomFile} from '../about/AboutHomes';
+import {Linking, Alert} from 'react-native';
+import DownloadCaseForm from './DownloadCaseForm';
 // import PdfImg from '@/assets/images/pdf.webp';
 
+// const parseAndFormatImages = (imageData: string | null) => {
+//   if (!imageData) return [];
+//   try {
+//     const parsed = JSON.parse(imageData);
+
+//     const flat = Array.isArray(parsed) ? parsed.flat(Infinity) : [];
+
+//     return flat.map((img: CustomFile) => ({
+//       fileName: img.fileName,
+//       filePath: img.filePath.replace(/\\/g, '/'),
+//       type: img.type,
+//     }));
+//   } catch (error) {
+//     console.error('Failed to parse image data:', error);
+//     return [];
+//   }
+// };
 const CaseStudiesList = () => {
   const [caseStudiesData, setCaseStudiesData] = React.useState<CaseStudy[]>([]);
   const [activeTab, setActiveTab] = useState<string>('All');
@@ -25,6 +49,8 @@ const CaseStudiesList = () => {
   const [caseFormOpen, setCaseFormOpen] = useState(false);
   const [selectedCaseStudyData, setSelectedCaseStudyData] = useState({});
   const {width} = useWindowDimensions();
+
+  console.log(caseFormOpen, selectedCaseStudyData);
 
   useEffect(() => {
     const fetchCaseStudies = async () => {
@@ -54,6 +80,24 @@ const CaseStudiesList = () => {
       ).values(),
     );
   }, [filteredByActive]);
+
+  const openPdfInNewTab = async (url?: string) => {
+    if (!url) return;
+
+    try {
+      const pdfUrl = getPhotoUrl(url) ?? '';
+
+      const supported = await Linking.canOpenURL(pdfUrl);
+      if (!supported) {
+        Alert.alert('Error', 'Cannot open this PDF');
+        return;
+      }
+
+      await Linking.openURL(pdfUrl);
+    } catch (error) {
+      console.error('Failed to open PDF:', error);
+    }
+  };
 
   return (
     <>
@@ -127,8 +171,7 @@ const CaseStudiesList = () => {
                     <View key={item.id} style={styles.card}>
                       {/* Image */}
                       <TouchableOpacity
-                      // onPress={() => openPdfInNewTab(item.document)}
-                      >
+                        onPress={() => openPdfInNewTab(item.document)}>
                         <Image
                           source={{uri: mainImageUrl || ''}}
                           style={styles.cardImage}
@@ -171,6 +214,54 @@ const CaseStudiesList = () => {
           </View>
         </View>
       </ScrollView>
+
+      {caseFormOpen && (
+        <Modal
+          visible={caseFormOpen}
+          transparent
+          animationType="fade"
+          statusBarTranslucent>
+          {/* Backdrop (prevent dismiss) */}
+          <Pressable style={styles.backdrop} />
+
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.centered}>
+            <View style={styles.dialog}>
+              {/* Header */}
+              <Text style={styles.title}>Case Study</Text>
+
+              {/* Content */}
+              <ScrollView
+                style={styles.content}
+                showsVerticalScrollIndicator={false}>
+                <DownloadCaseForm
+                  setCaseFormOpen={setCaseFormOpen}
+                  selectedCaseStudyData={selectedCaseStudyData}
+                />
+              </ScrollView>
+
+              {/* Footer */}
+              <View style={styles.footer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => setCaseFormOpen(false)}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    // Trigger submit via ref or internal submit handler
+                    // Recommended: expose submit method from form
+                  }}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+      )}
     </>
   );
 };
@@ -281,6 +372,59 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontWeight: '500',
     color: '#1e3a8a',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+
+  dialog: {
+    width: '100%',
+    maxWidth: 420,
+    maxHeight: '85%',
+    backgroundColor: '#f5faff', // primary-light
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    elevation: 8,
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#003a5d', // primary
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderColor: '#d0d7de',
+    marginBottom: 8,
+  },
+
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderColor: '#d0d7de',
+  },
+
+  button: {
+    backgroundColor: '#005c8a', // tertiary
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });
 

@@ -9,10 +9,11 @@ import {
   Animated,
   Modal,
 } from 'react-native';
-import {WebView} from 'react-native-webview';
+// import {WebView} from 'react-native-webview';
 import {Banner} from '../../core/model/banner';
 import {OurVideo} from '../../core/model/ourVideo';
 import {getPhotoUrl} from '../product/ProductList';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 const {height} = Dimensions.get('window');
 
@@ -118,12 +119,18 @@ export default function HomesHeroSection({
           <Text style={{color: '#fff', fontSize: 18}}>✕</Text>
         </TouchableOpacity>
 
-        <WebView
+        {/* <WebView
           source={{
-            uri: `https://www.youtube.com/embed/${videoId}?autoplay=1`,
+            uri: `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`,
           }}
-          allowsFullscreenVideo
-        />
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          allowsFullscreenVideo={true}
+          mediaPlaybackRequiresUserAction={false}
+          originWhitelist={['*']}
+          userAgent="Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36"
+        /> */}
+        <YoutubePlayer height={300} play={true} videoId={videoId} />
       </Modal>
     </View>
   );

@@ -77,7 +77,7 @@ export default function BrandFeaturesSection() {
       </View>
 
       {/* Features */}
-      <FlatList
+      {/* <FlatList
         data={features}
         keyExtractor={(_, i) => i.toString()}
         numColumns={2} // change to 1 or 3 based on screen
@@ -86,7 +86,22 @@ export default function BrandFeaturesSection() {
         renderItem={({item}) => (
           <View style={styles.card}>
             <View style={styles.iconWrapper}>
-              {/* <Image source={item.icon} style={styles.icon} /> */}
+            </View>
+
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text style={styles.cardDesc}>{item.desc}</Text>
+          </View>
+        )}
+      /> */}
+      <FlatList
+        data={features}
+        keyExtractor={(_, i) => i.toString()}
+        contentContainerStyle={styles.list}
+        renderItem={({item}) => (
+          <View style={styles.card}>
+            {/* Icon Placeholder */}
+            <View style={styles.iconCircle}>
+              <View style={styles.iconDot} />
             </View>
 
             <Text style={styles.cardTitle}>{item.title}</Text>
@@ -114,11 +129,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#00141F',
   },
 
+  list: {
+    gap: 24,
+  },
   header: {
     alignItems: 'center',
     marginBottom: 32,
   },
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
 
+  iconDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#9ddcff',
+  },
   badge: {
     backgroundColor: '#1e3a8a',
     color: '#ffffff',
@@ -149,10 +183,10 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1,
-    backgroundColor: '#1e3a8a',
     borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.15)',
     paddingVertical: 20,
     paddingHorizontal: 12,
     alignItems: 'center',

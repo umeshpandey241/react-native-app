@@ -1,4 +1,4 @@
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import React, {useEffect} from 'react';
 import {Banner} from '../../core/model/banner';
 import {Industrie} from '../../core/model/industrie';
@@ -55,7 +55,7 @@ const HomesHome = () => {
     // Fetch industries data
     const fetchIndustries = async () => {
       const ourIndustrieData = await getAllIndustries();
-      console.log(ourIndustrieData, 'video');
+      // console.log(ourIndustrieData, 'video');
       setIndustrieData(ourIndustrieData);
     };
     fetchIndustries();
@@ -65,7 +65,7 @@ const HomesHome = () => {
     // Fetch industries data
     const fetchIndustriesType = async () => {
       const ourIndustrieData = await getAllIndustriesType();
-      console.log(ourIndustrieData, 'video');
+      // console.log(ourIndustrieData, 'video');
       setIndustriesTypeData(ourIndustrieData);
     };
     fetchIndustriesType();
@@ -83,7 +83,7 @@ const HomesHome = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       const fetchBlogsData = await getAllBlogs();
-      console.log(fetchBlogsData, 'blogsData');
+      // console.log(fetchBlogsData, 'blogsData');
       setBlogsData(fetchBlogsData);
     };
     fetchBlogs();
@@ -92,7 +92,7 @@ const HomesHome = () => {
   useEffect(() => {
     const fetchClients = async () => {
       const fetchClientsData = await getAllClients();
-      console.log(fetchClientsData, 'fetchClientsData');
+      // console.log(fetchClientsData, 'fetchClientsData');
       setOurClientsData(fetchClientsData);
     };
     fetchClients();

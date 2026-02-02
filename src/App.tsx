@@ -40,6 +40,7 @@ import CaseStudiesList from './screens/caseStudies/CaseStudiesList';
 import CareersHome from './screens/career/CareersHome';
 import HomesHome from './screens/home/HomesHome';
 import Search from './screens/search/Search';
+import ContactsHome from './screens/contacts/ContactsHome';
 
 /* <!--router-link-admin-Import--> */
 
@@ -67,7 +68,7 @@ export type RootStackParamList = {
   AppUserTestsEdit: {id?: any};
 
   HomesHome: undefined;
-  About: undefined;
+  AboutHomes: undefined;
   IndustriesList: undefined;
   IndustriesView: {slug: string};
   ProductList: undefined;
@@ -78,6 +79,7 @@ export type RootStackParamList = {
   EventView: {slug: string};
   CaseStudiesList: undefined;
   CareersHome: undefined;
+  ContactsHome: undefined;
   Search: {slug: string};
 
   //<!--router-link-admin-Export-->
@@ -169,7 +171,7 @@ const App = (): React.JSX.Element => {
                 initialRouteName="HomesHome">
                 {/* <!--router-link-admin--> */}
                 {/* <Stack.Screen name="RemoteNotification" component={RemoteNotification} /> */}
-                <Stack.Screen name="About" component={AboutHomes} />
+                <Stack.Screen name="AboutHomes" component={AboutHomes} />
                 <Stack.Screen
                   name="IndustriesList"
                   component={IndustriesList}
@@ -190,6 +192,7 @@ const App = (): React.JSX.Element => {
                   component={CaseStudiesList}
                 />
                 <Stack.Screen name="CareersHome" component={CareersHome} />
+                <Stack.Screen name="ContactsHome" component={ContactsHome} />
                 <Stack.Screen name="Search" component={Search} />
               </Stack.Navigator>
             </NavigationContainer>

@@ -26,8 +26,12 @@ import {Industrie} from '../../core/model/industrie';
 import {Product} from '../../core/model/product';
 import ProductCard from './ProductCard';
 import EnquiryProductForm from './EnquiryProductForm';
+import RNFS from 'react-native-fs';
 // import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
-import {getIndustryByProductId} from '../../core/service/industries.service';
+import {
+  fileDownload,
+  getIndustryByProductId,
+} from '../../core/service/industries.service';
 
 interface variantProduct {
   featureBenifit: string;
@@ -45,6 +49,24 @@ interface productData {
   product: Product[];
   variantProduct: variantProduct[];
 }
+
+const parseAndFormatImages = (imageData: string | null) => {
+  if (!imageData) return [];
+  try {
+    const parsed = JSON.parse(imageData);
+
+    const flat = Array.isArray(parsed) ? parsed.flat(Infinity) : [];
+
+    return flat.map((img: CustomFile) => ({
+      fileName: img.fileName,
+      filePath: img.filePath.replace(/\\/g, '/'),
+      type: img.type,
+    }));
+  } catch (error) {
+    console.error('Failed to parse image data:', error);
+    return [];
+  }
+};
 
 const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
@@ -84,6 +106,9 @@ const ProductView = ({route}) => {
   const [enquiryFormOpen, setEnquiryFormOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [industries, setIndustries] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState<CustomFile[]>(
+    parseAndFormatImages(mainProduct?.brochure ?? null),
+  );
 
   console.log(industries, 'industries');
 
@@ -113,6 +138,10 @@ const ProductView = ({route}) => {
       console.log(industriesData, 'industy data');
     };
     preLoad();
+  }, [mainProduct]);
+
+  useEffect(() => {
+    setUploadedFiles(parseAndFormatImages(mainProduct?.brochure ?? null));
   }, [mainProduct]);
 
   const navigation = useNavigation<any>();
@@ -166,6 +195,20 @@ const ProductView = ({route}) => {
     setActiveId(prev => (prev === id ? null : id));
   };
 
+  const downloadFile = async (file: CustomFile) => {
+    try {
+      const response = await fileDownload(file);
+      if (!response) {
+        throw new Error('Download function returned no data');
+      }
+      const base64Data = Buffer.from(response).toString('base64');
+      const filePath = `${RNFS.DownloadDirectoryPath}/${file.fileName}`;
+      await RNFS.writeFile(filePath, base64Data, 'base64');
+      console.log('File downloaded at:', filePath);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
   const renderItem = ({item}: any) => {
     // const imageUrl = getPhotoUrl(item.image);
 
@@ -237,8 +280,7 @@ const ProductView = ({route}) => {
                 {/* {uploadedFiles?.length > 0 && ( */}
                 <Pressable
                   style={styles.downloadBtn}
-                  // onPress={() => downloadFile(uploadedFiles[0])}
-                >
+                  onPress={() => downloadFile(uploadedFiles[0])}>
                   <Ionicons name="document-text" size={18} color="#E5252A" />
                   <Text style={styles.downloadText}>Download Brochure</Text>
                 </Pressable>

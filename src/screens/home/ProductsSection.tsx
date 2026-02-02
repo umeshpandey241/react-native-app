@@ -10,7 +10,7 @@ import {
 import {Product} from '../../core/model/product';
 import {useNavigation} from '@react-navigation/native';
 import ProductCard from '../product/ProductCard';
-import {getPhotoUrl} from '../product/ProductList';
+// import {getPhotoUrl} from '../product/ProductList';
 
 const {width} = Dimensions.get('window');
 

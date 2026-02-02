@@ -1,7 +1,5 @@
 import {CommonDataDefault} from '@/core/model/commonDataDefault';
 import {CustomFile} from '@/core/model/customfile';
-import {getAuthHeaders} from '@/lib/getHeaders';
-import {useLanguageStore} from '@/store/useLanguage.store';
 import {BASE_URL} from '../../../config/config';
 
 const getAll = async (token?: string | unknown, language?: string) => {
@@ -11,13 +9,9 @@ const getAll = async (token?: string | unknown, language?: string) => {
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Get`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -32,23 +26,15 @@ const getAll = async (token?: string | unknown, language?: string) => {
   }
 };
 
-const getById = async (
-  commonDataDefaultID: string,
-  token?: string | unknown,
-  language?: string,
-) => {
+const getById = async (commonDataDefaultID: string) => {
   const payload = {
     id: commonDataDefaultID,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/GetById`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -63,23 +49,15 @@ const getById = async (
   }
 };
 
-const draft = async (
-  payload: CommonDataDefault,
-  token?: string | unknown,
-  language?: string,
-) => {
+const draft = async (payload: CommonDataDefault) => {
   // const payload = {
   //     "id": commonDataDefaultID
   // }
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Draft`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -94,19 +72,11 @@ const draft = async (
   }
 };
 
-const add = async (
-  payload: CommonDataDefault,
-  token?: string | unknown,
-  language?: string,
-) => {
+const add = async (payload: CommonDataDefault) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Add`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -122,19 +92,11 @@ const add = async (
   }
 };
 
-const update = async (
-  payload: CommonDataDefault,
-  token?: string | unknown,
-  language?: string,
-) => {
+const update = async (payload: CommonDataDefault) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Update`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -150,23 +112,15 @@ const update = async (
   }
 };
 
-const deleteData = async (
-  userId: string,
-  token?: string | unknown,
-  language?: string,
-) => {
+const deleteData = async (userId: string) => {
   const payload = {
     Id: userId,
   };
 
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Delete`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
 
@@ -182,30 +136,14 @@ const deleteData = async (
   }
 };
 
-const fileUpload = async (
-  file: File,
-  token?: string | unknown,
-  language?: string,
-): Promise<CustomFile> => {
+const fileUpload = async (file: File): Promise<CustomFile> => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const headers = getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
-
-    if (headers['Content-Type']) {
-      delete headers['Content-Type'];
-    }
-
     const response = await fetch(`${BASE_URL}/CommonDataDefault/FileUpload`, {
       method: 'POST',
-      // headers: {
-      //     Authorization: `Bearer ${token}`,
-      // },
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: formData,
     });
     if (!response.ok) {
@@ -231,19 +169,11 @@ export interface FileInfo {
   filePath: string;
 }
 
-const fileDownload = async (
-  fileInfo: FileInfo,
-  token?: string | unknown,
-  language?: string,
-): Promise<Blob> => {
+const fileDownload = async (fileInfo: FileInfo): Promise<Blob> => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/CommonDataDefault/Download`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(fileInfo),
     });
 

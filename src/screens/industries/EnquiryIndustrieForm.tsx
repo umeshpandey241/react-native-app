@@ -3,6 +3,7 @@ import {
   Text,
   ScrollView,
   TextInput,
+  Alert,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
@@ -15,6 +16,7 @@ import {add as addData} from '../../core/service/enquiries.service';
 import FormFieldError from '../../components/FormFieldError';
 import CustomMultiSelect from '../../components/CustomMultiSelect';
 import {selectMultiData} from '../../sharedBase/dropdownUtils';
+import {Enquiry} from '../../core/model/enquiry';
 
 function initialFormState(): Enquiry {
   return {
@@ -54,7 +56,7 @@ export default function EnquiryIndustrieForm({
   loadingData: boolean;
 }) {
   const {t} = useTranslation();
-  const stepRefs = useRef<HTMLDivElement[]>([]);
+  // const stepRefs = useRef<HTMLDivElement[]>([]);
   const [formData, setFormData] = useState<Enquiry>(initialFormState);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const enquirySchema = enquiryValidate(t);
@@ -166,13 +168,14 @@ export default function EnquiryIndustrieForm({
       console.log(cleanedPayload, 'cleanedPayload');
       await addData(cleanedPayload);
       // toast.success('Your request has been submitted successfully');
-      console.log('Your request has been submitted successfully');
+      Alert.alert('Your request has been submitted successfully');
       setFormData(initialFormState);
       setEnquiryFormOpen(false);
       // setTimeout(() => {
       //     router.push("/");
       // }, 2000);
     } catch (error) {
+      Alert.alert('Error submitting form');
       console.error('Error submitting form:', error);
       // toast.error('Error submitting form. Please try again later.');
     } finally {
@@ -393,14 +396,14 @@ export default function EnquiryIndustrieForm({
                 selectedValues={selectedProduct.map(
                   u => u.id?.toString() ?? '',
                 )}
-                onChange={values => {
+                onValueChange={(values: string[]) =>
                   handleMultiSelectChange(
                     values,
                     'productId',
                     productsList,
                     setSelectedProduct,
-                  );
-                }}
+                  )
+                }
                 placeholder="Select Product"
                 maxDisplay={2}
                 controlName="productId"

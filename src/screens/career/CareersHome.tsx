@@ -25,7 +25,7 @@ import VideoCard from './VideoCard';
 import Header from '../../components/Header';
 import ApplyPostForm from './ApplyPostForm';
 import JobRequestForm from './JobRequestForm';
-// import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 // import {currentOpenings} from '../../assets/images/mission.jpg';
 
 const CareersHome = () => {
@@ -41,12 +41,13 @@ const CareersHome = () => {
   const ITEM_WIDTH = 280 + 16;
   const [activeVideoId, setActiveVideoId] = useState<number | null>(null);
   const [currentOffset, setCurrentOffset] = useState(0);
+  console.log(setCurrentOffset);
   const [requestFormOpen, setRequestFormOpen] = useState(false);
 
   useEffect(() => {
     const fetchJobVacancies = async () => {
       const fetchJobVacanciesData = await getAll();
-      console.log('fetchJobVacanciesData', fetchJobVacanciesData);
+      // console.log('fetchJobVacanciesData', fetchJobVacanciesData);
       setJobVacanciesData(fetchJobVacanciesData);
     };
     fetchJobVacancies();
@@ -55,7 +56,7 @@ const CareersHome = () => {
   useEffect(() => {
     const fetchJobCategories = async () => {
       const fetchJobCategoriesData = await getAllCategories();
-      console.log('fetchJobCategoriesData', fetchJobCategoriesData);
+      // console.log('fetchJobCategoriesData', fetchJobCategoriesData);
       setJobCategoriesData(fetchJobCategoriesData);
     };
     fetchJobCategories();
@@ -64,7 +65,7 @@ const CareersHome = () => {
   useEffect(() => {
     const fetchGallery = async () => {
       const fetchGalleryData = await getAllGalleries();
-      console.log('fetchGallery', fetchGalleryData);
+      // console.log('fetchGallery', fetchGalleryData);
       setGalleryData(fetchGalleryData);
     };
     fetchGallery();
@@ -73,7 +74,7 @@ const CareersHome = () => {
   useEffect(() => {
     const fetchOurVideos = async () => {
       const fetchOurVideosData = await getAllVideo();
-      console.log('fetchOurVideosData', fetchOurVideosData);
+      // console.log('fetchOurVideosData', fetchOurVideosData);
       setOurVideosData(fetchOurVideosData);
     };
     fetchOurVideos();
@@ -112,53 +113,55 @@ const CareersHome = () => {
     });
   };
 
-  const renderItem = ({item}) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <View style={styles.categoryRow}>
-          <View style={styles.categoryIcon}>
-            <Text style={styles.iconText}>⚗️</Text>
-          </View>
-          <Text style={styles.categoryText}>{item.jobCategoryIdName}</Text>
-        </View>
+  // const renderItem = ({item}) => (
+  //   <View style={styles.cardWrapper}>
+  //     <View style={styles.card}>
+  //       <View style={styles.cardContent}>
+  //         <View style={styles.categoryRow}>
+  //           <View style={styles.categoryIcon}>
+  //             <Text style={styles.iconText}>⚗️</Text>
+  //           </View>
+  //           <Text style={styles.categoryText}>{item.jobCategoryIdName}</Text>
+  //         </View>
 
-        <Text style={styles.title}>{item.name}</Text>
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Text>📍</Text>
-            <Text style={styles.metaText}>{item.location}</Text>
-          </View>
+  //         <Text style={styles.title}>{item.name}</Text>
+  //         <View style={styles.metaRow}>
+  //           <View style={styles.metaItem}>
+  //             <Text>📍</Text>
+  //             <Text style={styles.metaText}>{item.location}</Text>
+  //           </View>
 
-          <View style={styles.metaItem}>
-            <Text>⏱</Text>
-            <Text style={styles.metaText}>Full Time</Text>
-          </View>
-        </View>
+  //           <View style={styles.metaItem}>
+  //             <Text>⏱</Text>
+  //             <Text style={styles.metaText}>Full Time</Text>
+  //           </View>
+  //         </View>
 
-        <View style={styles.divider} />
+  //         <View style={styles.divider} />
 
-        <View style={styles.requirements}>
-          <Text style={styles.requirement}>
-            ✔ {item.experience} Experience Required
-          </Text>
-          <Text style={styles.requirement}>
-            ✔ {item.qualification} Qualification Required
-          </Text>
-        </View>
+  //         <View style={styles.requirements}>
+  //           <Text style={styles.requirement}>
+  //             ✔ {item.experience} Experience Required
+  //           </Text>
+  //           <Text style={styles.requirement}>
+  //             ✔ {item.qualification} Qualification Required
+  //           </Text>
+  //         </View>
 
-        <TouchableOpacity
-          style={styles.applyBtn}
-          onPress={() => {
-            setApplyPostForm(true);
-            setPostData(item);
-            console.log('Pressed');
-          }}>
-          <Text style={styles.applyText}>Apply Now</Text>
-          <Text style={styles.applyArrow}>↗</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  //         <TouchableOpacity
+  //           style={styles.applyBtn}
+  //           onPress={() => {
+  //             setApplyPostForm(true);
+  //             setPostData(item);
+  //             console.log('Pressed');
+  //           }}>
+  //           <Text style={styles.applyText}>Apply Now</Text>
+  //           <Text style={styles.applyArrow}>↗</Text>
+  //         </TouchableOpacity>
+  //       </View>
+  //     </View>
+  //   </View>
+  // );
 
   return (
     <>
@@ -219,49 +222,98 @@ const CareersHome = () => {
               </ScrollView>
             </View>
 
-            <View>
-              <FlatList
-                data={filterJobVacanciesData}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={2} // 📱 change to 1 for small screens if needed
-                columnWrapperStyle={{gap: 16}}
-                contentContainerStyle={{gap: 16, marginBottom: 64}}
-              />
+            <View style={styles.grid}>
+              {filterJobVacanciesData.map((item, index) => (
+                <View key={index} style={styles.cardWrapper}>
+                  <View style={styles.card}>
+                    <View style={styles.cardContent}>
+                      {/* Category */}
+                      <View style={styles.categoryRow}>
+                        <View style={styles.categoryIcon}>
+                          <Text style={styles.iconText}>⚗️</Text>
+                        </View>
+                        <Text style={styles.categoryText}>
+                          {item.jobCategoryIdName}
+                        </Text>
+                      </View>
+
+                      {/* Title */}
+                      <Text style={styles.title} numberOfLines={3}>
+                        {item.name}
+                      </Text>
+
+                      {/* Meta */}
+                      <View style={styles.metaRow}>
+                        <View style={styles.metaItem}>
+                          <Text>📍</Text>
+                          <Text style={styles.metaText}>{item.location}</Text>
+                        </View>
+
+                        <View style={styles.metaItem}>
+                          <Text>⏱</Text>
+                          <Text style={styles.metaText}>Full Time</Text>
+                        </View>
+                      </View>
+
+                      <View style={styles.divider} />
+
+                      {/* Requirements */}
+                      <View style={styles.requirements}>
+                        <Text style={styles.requirement}>
+                          ✔ {item.experience} Experience Required
+                        </Text>
+                        <Text style={styles.requirement}>
+                          ✔ {item.qualification} Qualification Required
+                        </Text>
+                      </View>
+
+                      {/* Button */}
+                      <TouchableOpacity
+                        style={styles.applyBtn}
+                        onPress={() => {
+                          setApplyPostForm(true);
+                          setPostData(item);
+                        }}>
+                        <Text style={styles.applyText}>Apply Now</Text>
+                        <Text style={styles.applyArrow}>↗</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
             </View>
 
-            <View style={styles.section}>
-              {/* <ImageBackground
-              source={{uri: currentOpenings.src}}
-              style={styles.card}
-              imageStyle={styles.image}> */}
-              {/* <LinearGradient
-              colors={['rgba(0,102,158,0.9)', 'rgba(11,132,210,0.9)']}
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}
-              style={styles.overlay}
-            /> */}
+            <View style={styles.section1}>
+              <LinearGradient
+                colors={['#0565A8', '#0B84D2']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.card}>
+                {/* Content */}
+                <View style={styles.content1}>
+                  <Text style={styles.title1}>
+                    Didn’t find a match in our current openings?
+                  </Text>
 
-              <View style={styles.content}>
-                <Text style={styles.title}>
-                  Didn’t find a match in our current openings?
-                </Text>
+                  <Text style={styles.description1}>
+                    Submit your resume and let us know your interests. We’ll
+                    contact you when a suitable position becomes available — so
+                    you never miss an opportunity to join our team.
+                  </Text>
+                </View>
 
-                <Text style={styles.description}>
-                  Submit your resume and let us know your interests. We’ll
-                  contact you when a suitable position becomes available — so
-                  you never miss an opportunity to join our team.
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.ctaButton}
-                onPress={() => setRequestFormOpen(true)}
-                accessibilityLabel="Open application request form">
-                <Text style={styles.ctaIcon}>↗</Text>
-                <Text style={styles.ctaText}>Apply Now</Text>
-              </TouchableOpacity>
-              {/* </ImageBackground> */}
+                {/* CTA */}
+                <TouchableOpacity
+                  style={styles.ctaButton1}
+                  onPress={() => setRequestFormOpen(true)}
+                  activeOpacity={0.85}>
+                  {/* <View style={styles.ctaIconCircle}> */}
+                  <View style={styles.ctaIconCircle}>
+                    <Text style={styles.ctaIcon1}>↗</Text>
+                  </View>
+                  <Text style={styles.ctaText1}>Apply Now</Text>
+                </TouchableOpacity>
+              </LinearGradient>
             </View>
           </View>
         </View>
@@ -428,6 +480,15 @@ const DetailRow = ({label, value}: any) => (
 export default CareersHome;
 
 const styles = StyleSheet.create({
+  cardWrapper: {
+    flex: 1, // 🔥 MOST IMPORTANT
+  },
+  grid: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    gap: 16,
+    paddingHorizontal: 16,
+  },
   section: {
     width: '100%',
     paddingVertical: 32,
@@ -450,7 +511,7 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start', // mx-0
     textTransform: 'uppercase',
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0B5ED7',
     color: '#ffffff',
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -495,7 +556,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   activeTab: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0B5ED7',
     borderColor: '#6366f1',
   },
   tabText: {
@@ -507,83 +568,7 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: '#ffffff',
   },
-  card: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    padding: 16,
-    elevation: 2,
-  },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  categoryIcon: {
-    backgroundColor: 'rgba(99,102,241,0.1)',
-    padding: 8,
-    borderRadius: 20,
-  },
-  categoryText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1e3a8a',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    gap: 20,
-    marginTop: 4,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#1e3a8a',
-    textTransform: 'capitalize',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#e5e7eb',
-    marginVertical: 8,
-  },
-  requirements: {
-    gap: 6,
-  },
-  requirement: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1e3a8a',
-  },
-  applyBtn: {
-    backgroundColor: '#6366f1',
-    borderRadius: 6,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  applyText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  applyArrow: {
-    color: '#ffffff',
-    fontSize: 16,
-  },
+
   emptyText: {
     textAlign: 'center',
     paddingVertical: 40,
@@ -616,7 +601,7 @@ const styles = StyleSheet.create({
   },
   ctaIcon: {
     fontSize: 26,
-    color: '#6366f1',
+    backgroundColor: '#0B5ED7',
   },
   ctaText: {
     fontSize: 12,
@@ -855,6 +840,151 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+  },
+
+  cardContent: {
+    padding: 16,
+  },
+
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  categoryIcon: {
+    backgroundColor: '#EAF2FF',
+    padding: 6,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+
+  categoryText: {
+    fontWeight: '600',
+    color: '#1F3C88',
+  },
+
+  // title: {
+  //   fontSize: 16,
+  //   fontWeight: '700',
+  //   marginVertical: 6,
+  //   color: '#0A2540',
+  // },
+
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 6,
+  },
+
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  metaText: {
+    fontSize: 12,
+    color: '#555',
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 10,
+  },
+
+  requirements: {
+    gap: 6,
+  },
+
+  requirement: {
+    fontSize: 12,
+    color: '#333',
+  },
+
+  applyBtn: {
+    backgroundColor: '#0B5ED7',
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+
+  applyText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+
+  applyArrow: {
+    color: '#fff',
+  },
+  section1: {
+    paddingHorizontal: 16,
+    marginVertical: 24,
+  },
+
+  card1: {
+    borderRadius: 24,
+    padding: 24,
+    minHeight: 300,
+    justifyContent: 'space-between',
+  },
+
+  content1: {
+    gap: 12,
+  },
+
+  title1: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
+    lineHeight: 28,
+  },
+
+  description1: {
+    fontSize: 14,
+    color: '#EAF6FF',
+    lineHeight: 20,
+  },
+
+  ctaButton1: {
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  ctaIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+  },
+
+  ctaIcon1: {
+    fontSize: 26,
+    color: '#0B84D2',
+    fontWeight: '700',
+  },
+
+  ctaText1: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',

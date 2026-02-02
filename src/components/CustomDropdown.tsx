@@ -45,7 +45,7 @@ export function CustomDropdown<T = any>({
     if (tempValue !== selectedValue) {
       setTempValue(selectedValue);
     }
-  }, [selectedValue, tempValue]);
+  }, [selectedValue]);
 
   const normalize = (item: any) => {
     if (item.label !== undefined && item.value !== undefined) {
@@ -57,7 +57,7 @@ export function CustomDropdown<T = any>({
     return {label: String(item), value: item};
   };
 
-  const normalizedOptions = options?.map(normalize);
+  const normalizedOptions = options.map(normalize);
 
   const openDrawer = () => {
     setVisible(true);
@@ -89,7 +89,7 @@ export function CustomDropdown<T = any>({
     closeDrawer();
   };
 
-  const filteredOptions = normalizedOptions?.filter(o =>
+  const filteredOptions = normalizedOptions.filter(o =>
     o.label?.toLowerCase().includes(searchText.toLowerCase()),
   );
 

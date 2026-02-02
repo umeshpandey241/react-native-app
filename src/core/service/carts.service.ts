@@ -1,26 +1,16 @@
-import {getAuthHeaders} from '@/lib/getHeaders';
-import {useLanguageStore} from '@/store/useLanguage.store';
 import {CartItemData} from '@/types/carts';
 import {BASE_URL} from '../../../config/config';
 
-const getAll = async (
-  userId?: number,
-  token?: string | unknown,
-  language?: string,
-) => {
+const getAll = async (userId?: number) => {
   const payload = {
     condition: {
       AppUserId: userId,
     },
   };
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Cart/Get`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -34,19 +24,11 @@ const getAll = async (
   }
 };
 
-const cartItemRemove = async (
-  payload: CartItemData,
-  token?: string | unknown,
-  language?: string,
-) => {
+const cartItemRemove = async (payload: CartItemData) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
     const response = await fetch(`${BASE_URL}/Cart/Remove`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -60,19 +42,15 @@ const cartItemRemove = async (
   }
 };
 
-const cartQuantityUpdate = async (
-  payload: CartItemData,
-  token?: string | unknown,
-  language?: string,
-) => {
+const cartQuantityUpdate = async (payload: CartItemData) => {
   try {
-    const headers = await getAuthHeaders(
-      token,
-      language || useLanguageStore.getState().selectedLanguage,
-    );
+    // const headers = await getAuthHeaders(
+    //   token,
+    //   language || useLanguageStore.getState().selectedLanguage,
+    // );
     const response = await fetch(`${BASE_URL}/Cart/CartQuantityUpdate`, {
       method: 'POST',
-      headers,
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
     });
     if (!response.ok) {

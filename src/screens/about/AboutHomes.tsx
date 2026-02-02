@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,6 @@ import {
   Dimensions,
   ScrollView,
   Pressable,
-  FlatList,
-  ImageBackground,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -19,9 +17,8 @@ import {getAll as getAllLeaders} from '../../core/service/leaderships.service';
 import {getAll as getAllVideos} from '../../core/service/ourVideos.service';
 import {BASE_URL} from '../../../config/config';
 import {Animated} from 'react-native';
-import Sidebar from '../../components/SideBar';
+
 import Header from '../../components/Header';
-// import {fetchResearchDevelopmentData} from '../../actions/researchDevelopment';
 
 export interface CustomFile {
   fileName: string;
@@ -123,7 +120,6 @@ export default function AboutSection() {
   useEffect(() => {
     const fetchData = async () => {
       const researchDevelopmentData = await getAll();
-      console.log(researchDevelopmentData, 'research');
       setResearch(researchDevelopmentData);
     };
     fetchData();
@@ -132,7 +128,6 @@ export default function AboutSection() {
   useEffect(() => {
     const fetchTeamsData = async () => {
       const leadershipData = await getAllLeaders();
-      console.log(leadershipData, 'leader');
       setTeam(leadershipData);
     };
     fetchTeamsData();
@@ -198,41 +193,41 @@ export default function AboutSection() {
     );
   }
 
-  const renderItem = ({item}) => {
-    if (!item) return null;
+  // const renderItem = ({item}) => {
+  //   if (!item) return null;
 
-    return (
-      <Pressable style={[styles.card, {width: CARD_WIDTH}]}>
-        <Image source={{uri: item}} style={styles.image} resizeMode="cover" />
-      </Pressable>
-    );
-  };
+  //   return (
+  //     <Pressable style={[styles.card, {width: CARD_WIDTH}]}>
+  //       <Image source={{uri: item}} style={styles.image} resizeMode="cover" />
+  //     </Pressable>
+  //   );
+  // };
 
-  const renderLeaderItem = ({item}) => {
-    const imageUrl = getPhotoUrl(item.uploadPhoto);
+  // const renderLeaderItem = ({item}) => {
+  //   const imageUrl = getPhotoUrl(item.uploadPhoto);
 
-    return (
-      <View style={[styles.card, {width: CARD_WIDTH}]}>
-        {imageUrl && (
-          <Image
-            source={{uri: imageUrl}}
-            style={styles.image}
-            resizeMode="cover"
-          />
-        )}
+  //   return (
+  //     <View style={[styles.card, {width: CARD_WIDTH}]}>
+  //       {imageUrl && (
+  //         <Image
+  //           source={{uri: imageUrl}}
+  //           style={styles.image}
+  //           resizeMode="cover"
+  //         />
+  //       )}
 
-        <View style={styles.overlay} />
+  //       <View style={styles.overlay} />
 
-        <View style={styles.content}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.designation}>{item.designation}</Text>
-          <Text style={styles.description} numberOfLines={4}>
-            {item.description}
-          </Text>
-        </View>
-      </View>
-    );
-  };
+  //       <View style={styles.content}>
+  //         <Text style={styles.name}>{item.name}</Text>
+  //         <Text style={styles.designation}>{item.designation}</Text>
+  //         <Text style={styles.description} numberOfLines={4}>
+  //           {item.description}
+  //         </Text>
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
   return (
     <>
@@ -345,52 +340,27 @@ export default function AboutSection() {
                 styles.cardsRow,
                 {flexDirection: IS_TABLET ? 'row' : 'column'},
               ]}>
-              {data.map(item => {
-                const isActive = active === item.id;
+              {data.map((item, index) => (
+                <View key={index} style={styles.card}>
+                  {/* Overlay (optional – remove if not needed) */}
+                  <View style={styles.overlay} />
 
-                return (
-                  <Pressable
-                    key={item.id}
-                    onPress={() => setActive(item.id)}
-                    style={[
-                      styles.card,
-                      isActive ? styles.cardActive : styles.cardInactive,
-                    ]}>
-                    {/* {item.image && (
-                    <Image
-                      source={item.image}
-                      style={[
-                        styles.cardImage,
-                        isActive && styles.cardImageActive,
-                      ]}
-                    />
-                  )} */}
+                  <View style={styles.cardContent}>
+                    <Text style={styles.cardTitle}>{item.title}</Text>
 
-                    <View
-                      style={[
-                        styles.overlay,
-                        isActive ? styles.overlayLight : styles.overlayDark,
-                      ]}
-                    />
-
-                    <View style={styles.cardContent}>
-                      {isActive ? (
-                        <>
-                          <Text style={styles.cardTitle}>{item.title}</Text>
-                          {item.items?.map((point, index) => (
-                            <View key={index} style={styles.listItem}>
-                              <Text style={styles.bullet}>{'\u2022'}</Text>
-                              <Text style={styles.cardText}>{point}</Text>
-                            </View>
-                          ))}
-                        </>
-                      ) : (
-                        <Text style={styles.verticalText}>{item.title}</Text>
-                      )}
-                    </View>
-                  </Pressable>
-                );
-              })}
+                    {item.items ? (
+                      item.items.map((point, idx) => (
+                        <View key={idx} style={styles.listItem}>
+                          <Text style={styles.bullet}>{'\u2022'}</Text>
+                          <Text style={styles.cardText}>{point}</Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.cardText}>{item.description}</Text>
+                    )}
+                  </View>
+                </View>
+              ))}
             </View>
           </View>
         </View>
@@ -505,19 +475,18 @@ export default function AboutSection() {
           </View>
 
           {/* GRID */}
-          {images.length > 0 ? (
-            <FlatList
-              data={images}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderItem}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingHorizontal: 16, gap: 16}}
-            />
-          ) : (
-            <Text style={styles.emptyText}>
-              No Research And Developments found.
-            </Text>
+          {images.length > 0 && (
+            <View style={styles.gallery}>
+              {images.map((item, index) => (
+                <Pressable key={index} style={styles.imageCard}>
+                  <Image
+                    source={{uri: item}}
+                    style={styles.image1}
+                    resizeMode="cover"
+                  />
+                </Pressable>
+              ))}
+            </View>
           )}
 
           {/* CTA */}
@@ -544,18 +513,41 @@ export default function AboutSection() {
 
           {/* GRID */}
           {teamImages.length > 0 ? (
-            <FlatList
-              data={team}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderLeaderItem}
-              horizontal
+            <ScrollView
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingHorizontal: 16, gap: 16}}
-            />
+              contentContainerStyle={styles.teamrow}>
+              {team.map((item, index) => {
+                const imageUrl = getPhotoUrl(item.uploadPhoto);
+
+                return (
+                  <View key={index} style={styles.teamcard}>
+                    {imageUrl && (
+                      <Image
+                        source={{uri: imageUrl}}
+                        style={styles.teamimage}
+                        resizeMode="cover"
+                      />
+                    )}
+
+                    {/* Dark gradient overlay */}
+                    <View style={styles.teamoverlay} />
+
+                    {/* Text content */}
+                    <View style={styles.teamcontent}>
+                      <Text style={styles.teamname}>{item.name}</Text>
+                      <Text style={styles.teamdesignation}>
+                        {item.designation}
+                      </Text>
+                      <Text style={styles.teamdescription} numberOfLines={3}>
+                        {item.description}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
           ) : (
-            <Text style={styles.emptyText}>
-              No Research And Developments found.
-            </Text>
+            <Text style={styles.emptyText}>No Leaders Found.</Text>
           )}
         </View>
 
@@ -674,7 +666,7 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    backgroundColor: '#6F42C1',
+    backgroundColor: '#0D6EFD',
     color: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -769,6 +761,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'flex-end',
     marginBottom: 12,
+    backgroundColor: '#0D6EFD',
   },
 
   cardActive: {
@@ -807,7 +800,7 @@ const styles = StyleSheet.create({
   },
 
   cardText: {
-    color: '#E9ECEF',
+    color: '#111',
     lineHeight: 22,
   },
 
@@ -960,5 +953,86 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 12,
     shadowOffset: {width: 0, height: 4},
+  },
+  gallery: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    gap: 16, // RN >= 0.71
+  },
+
+  imageCard: {
+    width: '100%',
+    height: '10%', // 🔥 2 columns
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+    elevation: 3,
+  },
+
+  image1: {
+    width: '100%',
+    height: 180, // adjust if needed
+  },
+  teamrow: {
+    paddingHorizontal: 16,
+    gap: 16, // spacing between cards
+  },
+
+  teamcard: {
+    width: '100%',
+    // CARD_WIDTH
+    height: 360,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#ddd',
+    elevation: 4,
+  },
+
+  teamimage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  teamoverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '35%',
+    backgroundColor: 'rgba(0,0,0,0.45)', // dark fade
+  },
+
+  teamcontent: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+  },
+
+  teamname: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  teamdesignation: {
+    color: '#E5E7EB',
+    fontSize: 14,
+    marginTop: 4,
+  },
+
+  teamdescription: {
+    color: '#D1D5DB',
+    fontSize: 12,
+    marginTop: 6,
+    lineHeight: 16,
+  },
+
+  teamemptyText: {
+    textAlign: 'center',
+    marginVertical: 24,
+    color: '#666',
   },
 });
