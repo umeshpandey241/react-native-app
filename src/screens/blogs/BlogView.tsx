@@ -11,8 +11,10 @@ import {
   ScrollView,
   Pressable,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
 
 const {width} = Dimensions.get('window');
 const isTablet = width >= 768;
@@ -84,6 +86,9 @@ const BlogView = ({route}) => {
     <>
       <ScrollView style={styles.container}>
         <View style={styles.layout}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialCommunityIcons name="arrow-left" size={24} />
+          </TouchableOpacity>
           {/* MAIN CONTENT */}
           <View style={styles.content}>
             <Text style={styles.blogTitle}>{item?.name}</Text>

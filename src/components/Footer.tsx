@@ -1,13 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { RootStackParamList } from '../App';
-import { FooterStyles } from '../styles/FooterStyles';
-import { useTheme } from '../theme/ThemeContext';
-import { MaterialCommunityIcons, NativeStackNavigationProp, useNavigation, useRoute, View, TouchableOpacity, Text, useTranslation } from '../sharedBase/globalImport';
-import { useFetchRoleDetailsData } from '../sharedBase/lookupService';
+import React, {useEffect, useState} from 'react';
+import {RootStackParamList} from '../App';
+import {FooterStyles} from '../styles/FooterStyles';
+// import {useTheme} from '../theme/ThemeContext';
+import {
+  MaterialCommunityIcons,
+  NativeStackNavigationProp,
+  useNavigation,
+  useRoute,
+  View,
+  TouchableOpacity,
+  Text,
+  useTranslation,
+} from '../sharedBase/globalImport';
+// import {useFetchRoleDetailsData} from '../sharedBase/lookupService';
 
-type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'AppUserHome'>;
-
+type NavigationProps = NativeStackNavigationProp<
+  RootStackParamList,
+  'AppUserHome'
+>;
 
 const Footer = () => {
   const navigation = useNavigation<NavigationProps>();
@@ -17,14 +28,14 @@ const Footer = () => {
   const [modalType, setModalType] = useState('');
   const [selectedFilter, setSelectedFilter] = useState(1);
   const route = useRoute();
-  const { theme } = useTheme();
-  const { data: roleDetailsData } = useFetchRoleDetailsData();
-  const { t } = useTranslation();
+  // const {theme} = useTheme();
+  // const {data: roleDetailsData} = useFetchRoleDetailsData();
+  const {t} = useTranslation();
 
   const [filters, setFilters] = useState([
-    { id: 1, name: 'Filter Item 1', content: 'Filter Item 1 Content' },
-    { id: 2, name: 'Filter Item 2', content: 'Filter Item 2 Content' },
-    { id: 3, name: 'Filter Item 3', content: 'Filter Item 3 Content' },
+    {id: 1, name: 'Filter Item 1', content: 'Filter Item 1 Content'},
+    {id: 2, name: 'Filter Item 2', content: 'Filter Item 2 Content'},
+    {id: 3, name: 'Filter Item 3', content: 'Filter Item 3 Content'},
   ]);
 
   const openModal = (type: React.SetStateAction<string>) => {
@@ -32,27 +43,29 @@ const Footer = () => {
     setModalVisible(true);
   };
 
-  useEffect(() => {
-    const getRoleData = async () => {
-      try {
-        if (roleDetailsData && roleDetailsData.length > 0) {
-          setRoleData(roleDetailsData);
-        }
-      } catch (error) {
-        console.error('Error fetching role data:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const getRoleData = async () => {
+  //     try {
+  //       if (roleDetailsData && roleDetailsData.length > 0) {
+  //         setRoleData(roleDetailsData);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching role data:', error);
+  //     }
+  //   };
 
-    getRoleData();
-  }, [roleDetailsData]);
+  //   getRoleData();
+  // }, [roleDetailsData]);
 
   const hasAccessToPage = (pageName: string) => {
-    return roleData.some((action: any) => action.name.toLowerCase() === pageName.toLowerCase());
+    return roleData.some(
+      (action: any) => action.name.toLowerCase() === pageName.toLowerCase(),
+    );
   };
 
   const handleNavigation = (path: string, pageName: string) => {
     if (hasAccessToPage(pageName)) {
-      navigation.navigate({ name: path as keyof RootStackParamList } as any);
+      navigation.navigate({name: path as keyof RootStackParamList} as any);
     } else {
       navigation.navigate('NotAuthorized');
     }
@@ -60,28 +73,37 @@ const Footer = () => {
 
   const openAddForm = () => {
     if (route.name === 'AppUserList') {
-      navigation.navigate('AppUserEdit', { id: undefined });
+      navigation.navigate('AppUserEdit', {id: undefined});
     } else if (route.name === 'ProductList') {
-      navigation.navigate('ProductEdit', { id: undefined });
+      navigation.navigate('ProductEdit', {id: undefined});
     }
   };
 
   const hasAccess = (role: any, requiredAction: string) => {
-    if (!role) { return false; }
+    if (!role) {
+      return false;
+    }
 
-    const actions = typeof role.action === 'string' ? JSON.parse(role.action) : [];
+    const actions =
+      typeof role.action === 'string' ? JSON.parse(role.action) : [];
 
-    return actions.some((action: any) => action.name.toLowerCase() === requiredAction.toLowerCase());
+    return actions.some(
+      (action: any) =>
+        action.name.toLowerCase() === requiredAction.toLowerCase(),
+    );
   };
-
 
   return (
     <View style={[styles.footer]}>
-      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('AppUserHome')}>
-        <MaterialCommunityIcons name="home-outline" size={24} color={theme.primary} />
-        <Text style={styles.buttonText}>
-          {t('appUsers.form_detail.fields.modelname')}{"\n"}{t('globals.homes')}
-        </Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('HomesHome')}>
+        <MaterialCommunityIcons
+          name="home-outline"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>Homes</Text>
       </TouchableOpacity>
 
       {/* <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('AppUserHome')}>
@@ -95,36 +117,63 @@ const Footer = () => {
       </TouchableOpacity> */}
 
       {/* {hasAccess(roleData.find((r: any) => r.name.toLowerCase() === 'appuser'), 'List') && ( */}
-      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('AppUserList')}>
-        <MaterialCommunityIcons name="account-outline" size={24} color={theme.primary} />
-        <Text style={styles.buttonText}>
-          {t('appUsers.form_detail.fields.modelname')}{"\n"} {t('globals.list')}
-        </Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('AboutHomes')}>
+        <MaterialCommunityIcons
+          name="account-outline"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>About Us</Text>
       </TouchableOpacity>
       {/* )} */}
 
       {/* {hasAccess(roleData.find((r: any) => r.name.toLowerCase() === 'product'), 'List') && ( */}
-      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('ProductList')}>
-        <MaterialCommunityIcons name="package-variant-closed" size={24} color={theme.primary} />
-        <Text style={styles.buttonText}>
-          {t('products.form_detail.fields.modelname')}{"\n"} {t('globals.list')}
-        </Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('ProductList')}>
+        <MaterialCommunityIcons
+          name="package-variant-closed"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>Product</Text>
       </TouchableOpacity>
       {/* )} */}
 
-      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('AppUserTestsHome')}>
-        <MaterialCommunityIcons name="home-outline" size={24} color={theme.primary} />
-        <Text style={styles.buttonText}>
-          {t('appUserTests.form_detail.fields.modelname')}{"\n"}{t('globals.homes')}
-        </Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('IndustriesList')}>
+        <MaterialCommunityIcons
+          name="home-outline"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>Industrie</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('BlogList')}>
+        <MaterialCommunityIcons
+          name="home-outline"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>Blogs</Text>
       </TouchableOpacity>
 
       {/* {hasAccess(roleData.find((r: any) => r.name.toLowerCase() === 'AppUserTest'), 'List') && ( */}
-      <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('AppUserTestsList')}>
-        <MaterialCommunityIcons name="account-outline" size={24} color={theme.primary} />
-        <Text style={styles.buttonText}>
-          {t('appUserTests.form_detail.fields.modelname')} {"\n"}{t('globals.list')}
-        </Text>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('CareersHome')}>
+        <MaterialCommunityIcons
+          name="account-outline"
+          size={24}
+          // color={theme.primary}
+        />
+        <Text style={styles.buttonText}>Career</Text>
       </TouchableOpacity>
       {/* )} */}
 
@@ -241,11 +290,8 @@ const Footer = () => {
           </View>
         </View>
       </Modal> */}
-
     </View>
   );
 };
-
-
 
 export default Footer;

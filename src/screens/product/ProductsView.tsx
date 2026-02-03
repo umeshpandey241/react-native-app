@@ -32,6 +32,7 @@ import {
   fileDownload,
   getIndustryByProductId,
 } from '../../core/service/industries.service';
+import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
 
 interface variantProduct {
   featureBenifit: string;
@@ -223,6 +224,9 @@ const ProductView = ({route}) => {
     <>
       <ScrollView>
         <View style={styles.section}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialCommunityIcons name="arrow-left" size={24} />
+          </TouchableOpacity>
           <View style={styles.row}>
             <View style={styles.imageCol}>
               <View style={styles.imageCard}>
@@ -574,6 +578,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: IS_TABLET ? 'row' : 'column',
     gap: 24,
+    marginTop: 20,
   },
 
   imageCol: {flex: 1},

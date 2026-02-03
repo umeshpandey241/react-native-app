@@ -553,7 +553,7 @@ function EnquiryForm({
             <CustomMultiSelect
               options={productOptions}
               selectedValues={selectedProduct.map(u => u.id?.toString() ?? '')}
-              onChange={(values: string[]) => {
+              onValueChange={(values: string[]) => {
                 return handleMultiSelectChange(
                   values,
                   'productId',

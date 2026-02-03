@@ -308,7 +308,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                   </View>
                   <TouchableOpacity
                     onPress={() =>
-                      handleNavigationWithActive('AppUserHome', 'AppUser')
+                      handleNavigationWithActive('HomesHome', 'Home')
                     }
                     style={[
                       styles.menu,

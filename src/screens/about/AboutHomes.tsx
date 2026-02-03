@@ -19,6 +19,7 @@ import {BASE_URL} from '../../../config/config';
 import {Animated} from 'react-native';
 
 import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 export interface CustomFile {
   fileName: string;
@@ -50,12 +51,12 @@ export const getYouTubeId = (url: string) => {
 
 const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
-const CARD_WIDTH = IS_TABLET ? 300 : 260;
+// const CARD_WIDTH = IS_TABLET ? 300 : 260;
 
 export default function AboutSection() {
-  const [active, setActive] = useState<'mission' | 'vision' | 'values'>(
-    'mission',
-  );
+  // const [active, setActive] = useState<'mission' | 'vision' | 'values'>(
+  //   'mission',
+  // );
 
   const [research, setResearch] = useState([]);
   const [team, setTeam] = useState([]);
@@ -585,6 +586,7 @@ export default function AboutSection() {
           {/* </ImageBackground> */}
         </View>
       </ScrollView>
+      <Footer />
     </>
   );
 }

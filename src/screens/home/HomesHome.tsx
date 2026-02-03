@@ -28,6 +28,7 @@ import TestimonialSection from './TestimonialSection';
 import BlogsSection from './BlogsSection';
 import Header from '../../components/Header';
 import NewsletterSection from './NewsletterSection';
+import Footer from '../../components/Footer';
 
 const HomesHome = () => {
   const [bannerData, setBannerData] = React.useState<Banner[]>([]);
@@ -139,6 +140,7 @@ const HomesHome = () => {
         <BlogsSection blogsData={blogsData} />
         <NewsletterSection />
       </ScrollView>
+      <Footer />
     </>
   );
 };

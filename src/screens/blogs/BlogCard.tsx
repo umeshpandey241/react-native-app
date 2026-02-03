@@ -39,9 +39,8 @@ export default function BlogCard({
 
   return (
     <Pressable
-      onPress={() => navigation.navigate('BlogDetail', {slug})}
+      onPress={() => navigation.navigate('BlogView', {slug})}
       style={({pressed}) => [styles.card, pressed && {opacity: 0.95}]}>
-      {/* IMAGE */}
       <View style={styles.imageWrapper}>
         {image ? (
           <Image
@@ -55,7 +54,6 @@ export default function BlogCard({
           </View>
         )}
 
-        {/* Overlay icon */}
         <View style={styles.iconOverlay}>
           <View style={styles.iconCircle}>
             <Ionicons name="arrow-up-outline" size={18} color="#006699" />
@@ -63,9 +61,7 @@ export default function BlogCard({
         </View>
       </View>
 
-      {/* CONTENT */}
       <View style={styles.content}>
-        {/* TAGS */}
         {tagList.length > 0 && (
           <View style={styles.tagsRow}>
             {tagList.map((tag, i) => (
@@ -90,8 +86,6 @@ export default function BlogCard({
   );
 }
 
-/* ================= STYLES ================= */
-
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
@@ -106,7 +100,6 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
   },
 
-  /* IMAGE */
   imageWrapper: {
     height: IS_TABLET ? 260 : 220,
     width: '100%',
@@ -124,7 +117,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 
-  /* ICON */
   iconOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
@@ -137,12 +129,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  /* CONTENT */
   content: {
     padding: 14,
   },
 
-  /* TAGS */
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -160,7 +150,6 @@ const styles = StyleSheet.create({
     color: '#006699',
   },
 
-  /* TEXT */
   title: {
     fontSize: IS_TABLET ? 16 : 14,
     fontWeight: '600',

@@ -1,4 +1,5 @@
 // import {useState, useEffect} from 'react';
+// import {RoleDetail} from '../core/model/roledetail';
 // import {useListQuery} from '../store/useListQuery';
 // import {EnumDetail} from '../core/model/enumdetail';
 // import {useEnumDetailsService} from '../core/service/enumDetails.service';
@@ -75,7 +76,7 @@
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState<string | null>(null);
 
-//   // const {fetchRoleData} = useAppuserRoleService();
+//   const {fetchRoleData} = useAppuserRoleService();
 
 //   useEffect(() => {
 //     const fetchRoleDetails = async () => {

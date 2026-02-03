@@ -17,9 +17,10 @@ import {getAll} from '../../core/service/blogs.service';
 import {getBlogData} from '../../core/service/blogCategories.service';
 import Header from '../../components/Header';
 import {getPhotoUrl} from '../about/AboutHomes';
+import Footer from '../../components/Footer';
 
 const {width} = Dimensions.get('window');
-const isTablet = width >= 768;
+// const isTablet = width >= 768;
 
 interface BlogCategoryDetails {
   id: number;
@@ -79,7 +80,7 @@ export default function BlogList() {
     );
   }, [blogsList, activeTab]);
 
-  const numColumns = isTablet ? 3 : 2;
+  // const numColumns = isTablet ? 3 : 2;
 
   const renderBlog = ({item}: any) => {
     const imageUrl = getPhotoUrl(item.image);
@@ -128,68 +129,75 @@ export default function BlogList() {
       {/* <HeroSection title="Blogs" /> */}
       <Header Heading="Blogs" />
 
-      <View style={styles.section}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>INSIGHTS & INNOVATIONS</Text>
-          </View>
+      <ScrollView>
+        <View style={styles.section}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.chip}>
+              <Text style={styles.chipText}>INSIGHTS & INNOVATIONS</Text>
+            </View>
 
-          <Text style={styles.heading}>Latest From Our Blog</Text>
-          <Text style={styles.subHeading}>
-            Explore trends, tips, and expert views on filtration for every
-            industry.
-          </Text>
-        </View>
-        {/* Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tabs}>
-          <Pressable
-            style={[styles.tab, activeTab === 'All' && styles.activeTab]}
-            onPress={() => setActiveTab('All')}>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'All' && styles.activeTabText,
-              ]}>
-              All
+            <Text style={styles.heading}>Latest From Our Blog</Text>
+            <Text style={styles.subHeading}>
+              Explore trends, tips, and expert views on filtration for every
+              industry.
             </Text>
-          </Pressable>
-
-          {blogCategories.map((cat: any) => (
+          </View>
+          {/* Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContainer}>
             <Pressable
-              key={cat.id}
-              style={[styles.tab, activeTab === cat.name && styles.activeTab]}
-              onPress={() => setActiveTab(cat.name)}>
+              style={[styles.tab, activeTab === 'All' && styles.activeTab]}
+              onPress={() => setActiveTab('All')}>
               <Text
                 style={[
                   styles.tabText,
-                  activeTab === cat.name && styles.activeTabText,
+                  activeTab === 'All' && styles.activeTabText,
                 ]}>
-                {cat.name}
+                All
               </Text>
             </Pressable>
-          ))}
-        </ScrollView>
 
-        {filterOurBlogsData?.length > 0 ? (
-          <FlatList
-            data={filterOurBlogsData}
-            key={numColumns}
-            numColumns={numColumns}
-            renderItem={renderBlog}
-            keyExtractor={item => item.id.toString()}
-            columnWrapperStyle={{gap: 12}}
-            contentContainerStyle={{gap: 12}}
-          />
-        ) : (
-          <Text style={styles.empty}>
-            No blogs available for category: {activeTab}
-          </Text>
-        )}
-      </View>
+            {blogCategories.map(cat => (
+              <Pressable
+                key={cat.id}
+                style={[styles.tab, activeTab === cat.name && styles.activeTab]}
+                onPress={() => setActiveTab(cat.name)}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === cat.name && styles.activeTabText,
+                  ]}
+                  numberOfLines={1}>
+                  {cat.name}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContainer}>
+            {filterOurBlogsData?.length > 0 ? (
+              <View style={styles.grid}>
+                {filterOurBlogsData.map(item => (
+                  <View key={item.id} style={[styles.gridItem]}>
+                    {renderBlog({item})}
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.empty}>
+                No blogs available for category: {activeTab}
+              </Text>
+            )}
+          </ScrollView>
+        </View>
+      </ScrollView>
+
+      <Footer />
     </>
   );
 }
@@ -233,16 +241,19 @@ const styles = StyleSheet.create({
     color: '#002438',
   },
 
-  tabs: {
-    marginBottom: 24,
+  tabsContainer: {
+    paddingVertical: 8,
+    alignItems: 'center',
   },
 
   tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    height: 40,
+    paddingHorizontal: 18,
     borderRadius: 20,
     backgroundColor: '#e9f2fb',
     marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   activeTab: {
@@ -330,5 +341,20 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
     fontWeight: '500',
     color: '#002438',
+  },
+  scrollContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+  },
+
+  grid: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12,
+  },
+
+  gridItem: {
+    marginBottom: 12,
   },
 });

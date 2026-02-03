@@ -13,6 +13,7 @@ import {getAll} from '../../core/service/industries.service';
 import {getAll as getAllType} from '../../core/service/enumDetails.service';
 import {BASE_URL} from '../../../config/config';
 import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
@@ -119,21 +120,25 @@ export default function IndustrieList() {
     const imageUrl = getPhotoUrl(item.image);
 
     return (
-      <Pressable
-        onPress={() => navigation.navigate('IndustriesView', {slug: item.slug})}
-        style={styles.card}>
-        {imageUrl ? (
-          <Image source={{uri: imageUrl}} style={styles.cardImage} />
-        ) : (
-          <View style={styles.noImage}>
-            <Text>No Image</Text>
-          </View>
-        )}
+      <>
+        <Pressable
+          onPress={() =>
+            navigation.navigate('IndustriesView', {slug: item.slug})
+          }
+          style={styles.card}>
+          {imageUrl ? (
+            <Image source={{uri: imageUrl}} style={styles.cardImage} />
+          ) : (
+            <View style={styles.noImage}>
+              <Text>No Image</Text>
+            </View>
+          )}
 
-        <View style={styles.cardOverlay}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-        </View>
-      </Pressable>
+          <View style={styles.cardOverlay}>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+          </View>
+        </Pressable>
+      </>
     );
   };
 
@@ -174,6 +179,7 @@ export default function IndustrieList() {
           </Text>
         )}
       </View>
+      <Footer />
     </>
   );
 }

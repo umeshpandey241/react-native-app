@@ -20,7 +20,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Image,
+  // Image,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -32,6 +32,8 @@ import {contactValidate} from '../../schema/contact';
 import FormFieldError from '../../components/FormFieldError';
 import {useTranslation} from '../../sharedBase/globalUtils';
 import {add} from '../../core/service/contacts.service';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 // import contactHero from '@/assets/images/contactus.webp';
 // import officeMeet from '@/assets/images/officemeet.webp';
@@ -108,92 +110,98 @@ export default function ContactsHome() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{flex: 1}}>
-      <ScrollView style={styles.container}>
-        {/* Hero */}
-        {/* <Image source={contactHero} style={styles.heroImage} /> */}
-        <Text style={styles.heroTitle}>Contact Us</Text>
+    <>
+      <Header Heading="Contact" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{flex: 1}}>
+        <ScrollView style={styles.container}>
+          {/* Hero */}
+          {/* <Image source={contactHero} style={styles.heroImage} /> */}
+          <Text style={styles.heroTitle}>Contact Us</Text>
 
-        {/* Intro */}
-        <View style={styles.header}>
-          <Text style={styles.badge}>GET IN TOUCH</Text>
-          <Text style={styles.heading}>Contact Us</Text>
-          <Text style={styles.subheading}>
-            We're here to answer your questions and help you find the perfect
-            filtration solutions.
-          </Text>
-        </View>
+          {/* Intro */}
+          <View style={styles.header}>
+            <Text style={styles.badge}>GET IN TOUCH</Text>
+            <Text style={styles.heading}>Contact Us</Text>
+            <Text style={styles.subheading}>
+              We're here to answer your questions and help you find the perfect
+              filtration solutions.
+            </Text>
+          </View>
 
-        {/* Form */}
-        <View style={styles.card}>
-          {[
-            {key: 'name', placeholder: 'Name'},
-            {key: 'email', placeholder: 'Email', keyboard: 'email-address'},
-            {key: 'mobile', placeholder: 'Mobile', keyboard: 'number-pad'},
-            {key: 'city', placeholder: 'City'},
-            {key: 'state', placeholder: 'State'},
-          ].map(field => (
-            <View key={field.key}>
-              <TextInput
-                style={styles.input}
-                placeholder={field.placeholder}
-                value={formData[field.key as keyof Contact]}
-                onChangeText={v => handleInputChange(field.key, v)}
-                keyboardType={field.keyboard as any}
-              />
-              <FormFieldError field={field.key} errors={errors} />
-            </View>
-          ))}
+          {/* Form */}
+          <View style={styles.card}>
+            {[
+              {key: 'name', placeholder: 'Name'},
+              {key: 'email', placeholder: 'Email', keyboard: 'email-address'},
+              {key: 'mobile', placeholder: 'Mobile', keyboard: 'number-pad'},
+              {key: 'city', placeholder: 'City'},
+              {key: 'state', placeholder: 'State'},
+            ].map(field => (
+              <View key={field.key}>
+                <TextInput
+                  style={styles.input}
+                  placeholder={field.placeholder}
+                  value={formData[field.key as keyof Contact]}
+                  onChangeText={v => handleInputChange(field.key, v)}
+                  keyboardType={field.keyboard as any}
+                />
+                <FormFieldError field={field.key} errors={errors} />
+              </View>
+            ))}
 
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            placeholder="Message"
-            multiline
-            value={formData.message}
-            onChangeText={v => handleInputChange('message', v)}
-          />
-          <FormFieldError field="message" errors={errors} />
+            <TextInput
+              style={[styles.input, styles.textarea]}
+              placeholder="Message"
+              multiline
+              value={formData.message}
+              onChangeText={v => handleInputChange('message', v)}
+            />
+            <FormFieldError field="message" errors={errors} />
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitText}>Send Message</Text>
-            <Icon name="send" size={16} color="#fff" />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit}>
+              <Text style={styles.submitText}>Send Message</Text>
+              <Icon name="send" size={16} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-        {/* Contact Info */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Address</Text>
-          <Text style={styles.infoText}>
-            2972 Westheimer Rd. Santa Ana, Illinois 85486
-          </Text>
+          {/* Contact Info */}
+          <View style={styles.infoCard}>
+            <Text style={styles.infoTitle}>Address</Text>
+            <Text style={styles.infoText}>
+              2972 Westheimer Rd. Santa Ana, Illinois 85486
+            </Text>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <Text style={styles.infoTitle}>Get In Touch</Text>
-          <Text style={styles.infoText}>📞 (217) 555-0113</Text>
-          <Text style={styles.infoText}>💬 +91 9876543210</Text>
-          <Text style={styles.infoText}>✉ niranenterprises@gmail.com</Text>
-        </View>
+            <Text style={styles.infoTitle}>Get In Touch</Text>
+            <Text style={styles.infoText}>📞 (217) 555-0113</Text>
+            <Text style={styles.infoText}>💬 +91 9876543210</Text>
+            <Text style={styles.infoText}>✉ niranenterprises@gmail.com</Text>
+          </View>
 
-        {/* <Image source={officeMeet} style={styles.officeImage} /> */}
+          {/* <Image source={officeMeet} style={styles.officeImage} /> */}
 
-        {/* Map */}
-        <View style={styles.mapContainer}>
-          <WebView
-            source={{
-              uri: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.045!2d-99.1635!3d19.409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f92f30b0a3e3%3A0x502dc17e8c89c9a7!2sSanta%20Ana!5e0!3m2!1sen!2sin!4v1696600000000!5m2!1sen!2sin',
-            }}
-            style={{flex: 1}}
-            originWhitelist={['*']}
-            javaScriptEnabled
-            domStorageEnabled
-            scrollEnabled={false}
-          />
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Map */}
+          <View style={styles.mapContainer}>
+            <WebView
+              source={{
+                uri: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3763.045!2d-99.1635!3d19.409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f92f30b0a3e3%3A0x502dc17e8c89c9a7!2sSanta%20Ana!5e0!3m2!1sen!2sin!4v1696600000000!5m2!1sen!2sin',
+              }}
+              style={{flex: 1}}
+              originWhitelist={['*']}
+              javaScriptEnabled
+              domStorageEnabled
+              scrollEnabled={false}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      <Footer />
+    </>
   );
 }
 

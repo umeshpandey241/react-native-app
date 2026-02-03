@@ -20,6 +20,7 @@ import Header from '../../components/Header';
 // import {CustomFile} from '../about/AboutHomes';
 import {Linking, Alert} from 'react-native';
 import DownloadCaseForm from './DownloadCaseForm';
+import Footer from '../../components/Footer';
 // import PdfImg from '@/assets/images/pdf.webp';
 
 // const parseAndFormatImages = (imageData: string | null) => {
@@ -215,6 +216,7 @@ const CaseStudiesList = () => {
         </View>
       </ScrollView>
 
+      <Footer />
       {caseFormOpen && (
         <Modal
           visible={caseFormOpen}

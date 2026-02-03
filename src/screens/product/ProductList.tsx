@@ -13,6 +13,7 @@ import {CustomFile} from '../../core/model/customfile';
 import {getAll} from '../../core/service/products.service';
 import {BASE_URL} from '../../../config/config';
 import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
@@ -86,6 +87,7 @@ const ProductsList = () => {
           showsVerticalScrollIndicator={false}
         />
       </ScrollView>
+      <Footer />
     </>
   );
 };

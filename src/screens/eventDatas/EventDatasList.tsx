@@ -9,11 +9,13 @@ import {
   Platform,
 } from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import {DatePicker} from '../../sharedBase/globalImport';
 
 import {EventData} from '../../core/model/eventData';
 import {getAll} from '../../core/service/eventDatas.service';
 import EventCard from './EventCard';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 // import SearchIcon from '@/assets/icons/SearchIcon';
 
 const {width} = Dimensions.get('window');
@@ -32,8 +34,8 @@ const EventDatasList = () => {
   const [toDate, setToDate] = useState<Date | null>(null);
   const [search, setSearch] = useState('');
 
-  const [showFrom, setShowFrom] = useState(false);
-  const [showTo, setShowTo] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [pickerType, setPickerType] = useState<'from' | 'to' | null>(null);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -56,6 +58,23 @@ const EventDatasList = () => {
       String(date.getDate()).padStart(2, '0'),
     ].join('-');
   };
+
+  // const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  //   if (event.type !== 'set' || !selectedDate) {
+  //     setShowPicker(false);
+  //     return;
+  //   }
+
+  //   setShowPicker(false);
+
+  //   if (pickerType === 'from') {
+  //     setFromDate(selectedDate);
+  //   }
+
+  //   if (pickerType === 'to') {
+  //     setToDate(selectedDate);
+  //   }
+  // };
 
   const todayKey = toDateKey(new Date());
 
@@ -90,104 +109,117 @@ const EventDatasList = () => {
   }, [activeCategory, eventDatasData, fromDate, toDate, search, todayKey]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Events</Text>
+    <>
+      <Header Heading="Event" />
+      <View style={styles.container}>
+        <Text style={styles.heading}>Events</Text>
 
-      {/* CATEGORY TABS */}
-      <View style={styles.tabsRow}>
-        {categories.map(category => {
-          const isActive = activeCategory === category;
-          return (
-            <Pressable
-              key={category}
-              onPress={() => setActiveCategory(category)}
-              style={[styles.tab, isActive && styles.activeTab]}>
-              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
-                {category}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {/* FILTERS */}
-      <View style={styles.filters}>
-        {(activeCategory === 'Upcoming' || activeCategory === 'Expired') && (
-          <View style={styles.dateRow}>
-            <Text style={styles.label}>Select Date</Text>
-
-            <Pressable
-              style={styles.dateInput}
-              onPress={() => setShowFrom(true)}>
-              <Text>{fromDate ? fromDate.toDateString() : 'From'}</Text>
-            </Pressable>
-
-            <Pressable style={styles.dateInput} onPress={() => setShowTo(true)}>
-              <Text>{toDate ? toDate.toDateString() : 'To'}</Text>
-            </Pressable>
-          </View>
-        )}
-
-        {/* SEARCH */}
-        <View style={styles.searchRow}>
-          <TextInput
-            value={search}
-            onChangeText={e => setSearch(e)}
-            placeholder="Search Event..."
-            style={styles.searchInput}
-          />
-
-          <View style={styles.searchBtn}>
-            {/* <SearchIcon width={16} /> */}
-          </View>
-
-          {activeCategory !== 'Happening' && (
-            <Pressable style={styles.clearBtn} onPress={clearFilters}>
-              <Text style={styles.clearText}>Clear</Text>
-            </Pressable>
-          )}
+        {/* CATEGORY TABS */}
+        <View style={styles.tabsRow}>
+          {categories.map(category => {
+            const isActive = activeCategory === category;
+            return (
+              <Pressable
+                key={category}
+                onPress={() => setActiveCategory(category)}
+                style={[styles.tab, isActive && styles.activeTab]}>
+                <Text
+                  style={[styles.tabText, isActive && styles.activeTabText]}>
+                  {category}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
+
+        {/* FILTERS */}
+        <View style={styles.filters}>
+          {(activeCategory === 'Upcoming' || activeCategory === 'Expired') && (
+            <View style={styles.dateRow}>
+              <Text style={styles.label}>Select Date</Text>
+
+              <Pressable
+                style={styles.dateInput}
+                onPress={() => {
+                  setPickerType('from');
+                  setShowCalendar(true);
+                }}>
+                <Text>{fromDate ? fromDate.toDateString() : 'From'}</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.dateInput}
+                onPress={() => {
+                  setPickerType('to');
+                  setShowCalendar(true);
+                }}>
+                <Text>{toDate ? toDate.toDateString() : 'To'}</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {/* SEARCH */}
+          <View style={styles.searchRow}>
+            <TextInput
+              value={search}
+              onChangeText={e => setSearch(e)}
+              placeholder="Search Event..."
+              style={styles.searchInput}
+            />
+
+            <View style={styles.searchBtn}>
+              {/* <SearchIcon width={16} /> */}
+            </View>
+
+            {activeCategory !== 'Happening' && (
+              <Pressable style={styles.clearBtn} onPress={clearFilters}>
+                <Text style={styles.clearText}>Clear</Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+
+        {/* DATE PICKERS */}
+        <DatePicker
+          modal
+          mode="date"
+          open={showCalendar}
+          date={
+            pickerType === 'from'
+              ? fromDate ?? new Date()
+              : toDate ?? new Date()
+          }
+          onConfirm={date => {
+            setShowCalendar(false);
+
+            if (pickerType === 'from') {
+              setFromDate(date);
+            }
+
+            if (pickerType === 'to') {
+              setToDate(date);
+            }
+          }}
+          onCancel={() => setShowCalendar(false)}
+          theme={Platform.OS === 'ios' ? 'light' : 'light'}
+        />
+
+        {/* EVENTS GRID */}
+        {filteredEvents.length === 0 ? (
+          <Text style={styles.empty}>No events found: {activeCategory}</Text>
+        ) : (
+          <FlatList
+            data={filteredEvents}
+            numColumns={isTablet ? 3 : 1}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => <EventCard event={item} />}
+            columnWrapperStyle={isTablet ? {gap: 12} : undefined}
+            contentContainerStyle={{gap: 12}}
+          />
+        )}
       </View>
-
-      {/* DATE PICKERS */}
-      {showFrom && (
-        <DateTimePicker
-          value={fromDate ?? new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(_, date) => {
-            setShowFrom(false);
-            if (date) setFromDate(date);
-          }}
-        />
-      )}
-
-      {showTo && (
-        <DateTimePicker
-          value={toDate ?? new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(_, date) => {
-            setShowTo(false);
-            if (date) setToDate(date);
-          }}
-        />
-      )}
-
-      {/* EVENTS GRID */}
-      {filteredEvents.length === 0 ? (
-        <Text style={styles.empty}>No events found: {activeCategory}</Text>
-      ) : (
-        <FlatList
-          data={filteredEvents}
-          numColumns={isTablet ? 3 : 1}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <EventCard event={item} />}
-          columnWrapperStyle={isTablet ? {gap: 12} : undefined}
-          contentContainerStyle={{gap: 12}}
-        />
-      )}
-    </View>
+      <Footer />
+    </>
   );
 };
 

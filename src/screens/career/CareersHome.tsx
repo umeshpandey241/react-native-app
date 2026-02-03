@@ -26,6 +26,7 @@ import Header from '../../components/Header';
 import ApplyPostForm from './ApplyPostForm';
 import JobRequestForm from './JobRequestForm';
 import LinearGradient from 'react-native-linear-gradient';
+import Footer from '../../components/Footer';
 // import {currentOpenings} from '../../assets/images/mission.jpg';
 
 const CareersHome = () => {
@@ -368,6 +369,7 @@ const CareersHome = () => {
           </View>
         )}
       </ScrollView>
+      <Footer />
       <Modal
         visible={applyPostForm}
         animationType="slide"

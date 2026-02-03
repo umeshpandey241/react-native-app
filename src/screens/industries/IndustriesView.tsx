@@ -29,6 +29,10 @@ import BlogCard from '../blogs/BlogCard';
 import TestimonialSection from '../home/TestimonialSection';
 import EnquiryIndustrieForm from './EnquiryIndustrieForm';
 import RNFS from 'react-native-fs';
+import {
+  MaterialCommunityIcons,
+  useNavigation,
+} from '../../sharedBase/globalImport';
 
 const parseAndFormatImages = (imageData: string | null) => {
   if (!imageData) return [];
@@ -86,6 +90,7 @@ const IndustriesView = ({route}) => {
   const [enquiryFormOpen, setEnquiryFormOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   console.log(setLoadingData);
+  const navigation = useNavigation();
 
   // const industrie = industriesData[0] ?? null;
   const industry = useMemo(() => {
@@ -294,6 +299,9 @@ const IndustriesView = ({route}) => {
     <>
       <ScrollView>
         <View style={styles.wrapper}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialCommunityIcons name="arrow-left" size={24} />
+          </TouchableOpacity>
           {/* HEADER ROW */}
           <View style={styles.headerRow}>
             <Text style={styles.title}>{industry?.name}</Text>
@@ -312,7 +320,7 @@ const IndustriesView = ({route}) => {
                   style={styles.downloadBtn}
                   onPress={() => downloadFile(uploadedFiles[0])}>
                   {/* // <Pressable style={styles.downloadBtn}> */}
-                  <Ionicons name="document-text" size={20} color="#E5252A" />
+                  {/* <Ionicons name="document-text" size={20} color="#E5252A" /> */}
                   <Text style={styles.downloadText}>Download Brochure</Text>
                 </Pressable>
               )}
@@ -327,7 +335,8 @@ const IndustriesView = ({route}) => {
           {/* FILTRATION IMAGE */}
           <View style={styles.processSection}>
             <Text style={styles.subTitle}>
-              NIRAN&apos;s Solutions for the {industry?.name} Filtration Process
+              NIRAN&apos;s Solutions for the {industry?.name || ''} Filtration
+              Process
             </Text>
 
             {selectedImage ? (
