@@ -5,7 +5,7 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  // FlatList,
   Image,
   Pressable,
   ScrollView,

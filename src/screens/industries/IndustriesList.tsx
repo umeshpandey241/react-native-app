@@ -47,8 +47,6 @@ export const getPhotoUrl = (uploadPhoto: string | undefined) => {
   }
 };
 
-/* ------------------ component ------------------ */
-
 export default function IndustrieList() {
   const [industriesData, setIndustriesData] = useState<Array<any>>([]);
   const [industriesTypeData, setIndustriesTypeData] = useState<Array<any>>([]);
@@ -98,7 +96,7 @@ export default function IndustrieList() {
 
   /* ------------------ renderers ------------------ */
 
-  const renderTab = ({item}) => {
+  const renderTab = ({item}: any) => {
     const isActive = normalize(item.value) === activeTab;
 
     return (
@@ -116,14 +114,16 @@ export default function IndustrieList() {
     );
   };
 
-  const renderCard = ({item}) => {
+  const renderCard = ({item}: any) => {
     const imageUrl = getPhotoUrl(item.image);
 
     return (
       <>
         <Pressable
           onPress={() =>
-            navigation.navigate('IndustriesView', {slug: item.slug})
+            navigation.navigate('IndustriesView', {
+              slug: item.slug,
+            })
           }
           style={styles.card}>
           {imageUrl ? (

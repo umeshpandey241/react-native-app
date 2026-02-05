@@ -317,6 +317,30 @@ const getGlobalSearchData = async (searchText: string) => {
   }
 };
 
+const getNavbarData = async () => {
+  const payload = {
+    form: null,
+    condition: null,
+  };
+
+  try {
+    const response = await fetch(`${BASE_URL}/Home/GetNAvbarData`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ! status",${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+};
+
 export {
   getAll,
   update,
@@ -331,4 +355,5 @@ export {
   getHomeUserData,
   deleteUser,
   getGlobalSearchData,
+  getNavbarData,
 };

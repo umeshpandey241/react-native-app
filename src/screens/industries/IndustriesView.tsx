@@ -5,14 +5,16 @@ import {
   Image,
   Dimensions,
   Pressable,
-  Linking,
+  // Linking,
+  Alert,
   ScrollView,
   FlatList,
-  LayoutAnimation,
+  // LayoutAnimation,
   Platform,
   UIManager,
   Modal,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -28,13 +30,27 @@ import IndustriesCard from './IndustriesCard';
 import BlogCard from '../blogs/BlogCard';
 import TestimonialSection from '../home/TestimonialSection';
 import EnquiryIndustrieForm from './EnquiryIndustrieForm';
-import RNFS from 'react-native-fs';
+
 import {
   MaterialCommunityIcons,
   useNavigation,
+  useRoute,
 } from '../../sharedBase/globalImport';
 
-const parseAndFormatImages = (imageData: string | null) => {
+import {getProductByIndustryId} from '../../core/service/products.service';
+import IndustryDownloadCaseForm from './IndustryDownloadCaseForm';
+
+export function buildInfiniteSlides<T>(items: T[], visible = 3): T[] {
+  if (items.length === 0) return [];
+  if (items.length >= visible) return items;
+  const result: T[] = [];
+  while (result.length < visible * 4) {
+    result.push(...items);
+  }
+  return result;
+}
+
+export const parseAndFormatImages = (imageData: string | null) => {
   if (!imageData) return [];
   try {
     const parsed = JSON.parse(imageData);
@@ -60,8 +76,6 @@ if (
 }
 
 interface industrieData {
-  // id(id: any): unknown;
-  slug: any;
   blog: Blog[];
   faqs: IndustriFaq[];
   industrie: Industrie[];
@@ -72,31 +86,36 @@ const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
 const NUM_COLUMNS = IS_TABLET ? 2 : 1;
 
-const IndustriesView = ({route}) => {
-  const {slug, id} = route.params || {};
-  const [openId, setOpenId] = useState<number | null>(null);
-
-  const [industriesData, setIndustriesData] = React.useState<industrieData[]>(
-    [],
-  );
+const IndustriesView = () => {
+  const route = useRoute();
+  const {slug, id}: any = route.params || {};
+  const [openId] = useState<number | null>(null);
+  const [industriesData, setIndustriesData] = React.useState<industrieData>();
+  console.log('industry data', industriesData);
+  const [industriesRelatedIndustrieData, setIndustriesRelatedIndustrieData] =
+    useState<Industrie[]>([]);
+  console.log(industriesRelatedIndustrieData, 'industriesRelated');
   const industrie = industriesData?.industrie?.[0] ?? null;
+  const industry = industriesData?.industrie?.[0];
+  const productsOfIndustry = industriesData?.product ?? null;
+  const industryFaqs = industriesData?.faqs ?? null;
+  const industryTestimonial = industriesData?.testimonial ?? null;
+  const blogsData = industriesData?.blog ?? null;
+  // const blogsDataCount = blogsData?.length ?? null;
   const [uploadedFiles, setUploadedFiles] = useState<CustomFile[]>(
     parseAndFormatImages(industrie?.brochure ?? null),
   );
-  const [industriesRelatedIndustrieData, setIndustriesRelatedIndustrieData] =
-    useState<industrieData | null>(null);
-
-  const [selectedImage, setSelectedImage] = useState<string | undefined>();
   const [enquiryFormOpen, setEnquiryFormOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+
   const [loadingData, setLoadingData] = useState(false);
-  console.log(setLoadingData);
+  // console.log(setLoadingData);
   const navigation = useNavigation();
 
-  // const industrie = industriesData[0] ?? null;
-  const industry = useMemo(() => {
-    if (!slug) return null;
-    return industriesData.find(i => i.slug === slug) ?? null;
-  }, [industriesData, slug]);
+  const [caseFormOpen, setCaseFormOpen] = useState(false);
+  // Ensure selectedCaseStudyData is always of type Industrie (or CaseStudy)
+  const [selectedCaseStudyData, setSelectedCaseStudyData] =
+    useState<Industrie | null>(null);
 
   //   ?.filter(item => item.isActive === true)
   //   .reverse();
@@ -122,148 +141,64 @@ const IndustriesView = ({route}) => {
   useEffect(() => {
     // Fetch industries data
     const fetchIndustries = async () => {
-      const ourIndustrieData = await getAll();
+      const ourIndustrieData = await getIndustrieData({id, slug});
       setIndustriesData(ourIndustrieData);
     };
     fetchIndustries();
 
     const fetchIndustriesRelated = async () => {
-      const ourIndustrieRelatedData = await getIndustrieData({id, slug});
+      const ourIndustrieRelatedData = await getAll();
       setIndustriesRelatedIndustrieData(ourIndustrieRelatedData);
     };
     fetchIndustriesRelated();
   }, [slug, id]);
 
+  useEffect(() => {
+    setUploadedFiles(parseAndFormatImages(industrie?.brochure ?? null));
+  }, [industrie]);
+
+  useEffect(() => {
+    if (!industrie?.id) return;
+
+    setLoadingData(true);
+    const preLoad = async () => {
+      try {
+        const [productData] = await Promise.all([
+          getProductByIndustryId(industrie.id ?? 0),
+        ]);
+        setProducts(productData);
+      } catch (error) {
+        console.error('Error fetching dropdown data', error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    preLoad();
+  }, [industrie]);
+
   const mainImageUrl = useMemo(
-    () => getPhotoUrl(industry?.image),
-    [industry?.image],
+    () => getPhotoUrl(industrie?.filtrationProcess),
+    [industrie],
+  );
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(
+    mainImageUrl,
   );
 
   useEffect(() => {
     setSelectedImage(mainImageUrl);
   }, [mainImageUrl]);
 
-  useEffect(() => {
-    setUploadedFiles(parseAndFormatImages(industrie?.brochure ?? null));
-  }, [industrie]);
+  const otherIndustriesFilteredByActive = industriesRelatedIndustrieData
+    ?.filter(item => item.isActive === true)
+    .reverse();
 
-  const products = useMemo(() => {
-    return Array.isArray(industriesRelatedIndustrieData?.product)
-      ? industriesRelatedIndustrieData.product
-      : [];
-  }, [industriesRelatedIndustrieData]);
+  const relatedProductsFilteredByActive = productsOfIndustry?.filter(
+    item => item.isActive === true,
+  );
 
-  const industries = useMemo(() => {
-    return Array.isArray(industriesRelatedIndustrieData?.industrie)
-      ? industriesRelatedIndustrieData.industrie
-      : [];
-  }, [industriesRelatedIndustrieData]);
-
-  const blogs = useMemo(() => {
-    return Array.isArray(industriesRelatedIndustrieData?.blog)
-      ? industriesRelatedIndustrieData.blog
-      : [];
-  }, [industriesRelatedIndustrieData]);
-
-  const faqs = useMemo(() => {
-    return Array.isArray(industriesRelatedIndustrieData?.faqs)
-      ? industriesRelatedIndustrieData.faqs
-      : [];
-  }, [industriesRelatedIndustrieData]);
-
-  const relatedProductsFilteredByActive = useMemo(() => {
-    if (!industry?.id) return [];
-
-    return products.filter(product => {
-      if (!product.isActive) return false;
-
-      const industryIds = product.industrieId
-        ?.split(',')
-        .map(id => Number(id.trim()));
-
-      return industryIds?.includes(industry.id);
-    });
-  }, [products, industry?.id]);
-
-  const otherIndustriesFilteredByActive = useMemo(() => {
-    if (!industry) {
-      return [];
-    }
-
-    return industries
-      .filter(item => {
-        return (
-          item.isActive === true &&
-          item.id !== industry?.id &&
-          item.industrieType === industry?.industrieType
-        );
-      })
-      .reverse(); // optional: latest first
-  }, [industries, industry]);
-
-  const blogsData = useMemo(() => {
-    if (!industry?.blogId) {
-      return [];
-    }
-
-    const blogIds = industry.blogId.split(',').map(id => Number(id.trim()));
-
-    return blogs.filter(blog => {
-      return blog.isActive === true && blogIds.includes(blog.id);
-    });
-  }, [blogs, industry?.blogId]);
-
-  const industryFaqs = useMemo(() => {
-    return faqs.filter(faq => faq.isActive !== false);
-  }, [faqs]);
-
-  const industryTestimonials = useMemo(() => {
-    if (!industry?.industriTestimonialId) {
-      return [];
-    }
-
-    const testimonialIds = industry.industriTestimonialId
-      .split(',')
-      .map(id => Number(id.trim()));
-
-    const testimonials = Array.isArray(
-      industriesRelatedIndustrieData?.testimonial,
-    )
-      ? industriesRelatedIndustrieData.testimonial
-      : [];
-
-    return testimonials.filter(
-      t => t.isActive !== false && testimonialIds.includes(t.id),
-    );
-  }, [industry?.industriTestimonialId, industriesRelatedIndustrieData]);
-
-  const toggle = (id: number) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpenId(prev => (prev === id ? null : id));
-  };
-
-  const downloadFile = async (file: CustomFile) => {
-    try {
-      const response = await fileDownload(file);
-      if (!response) {
-        throw new Error('Download function returned no data');
-      }
-      const base64Data = Buffer.from(response).toString('base64');
-      const filePath = `${RNFS.DownloadDirectoryPath}/${file.fileName}`;
-      await RNFS.writeFile(filePath, base64Data, 'base64');
-      console.log('File downloaded at:', filePath);
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
-  };
   const renderItem = ({item}: any) => {
-    // const mainImageUrl = getPhotoUrl(item.image);
-
-    return (
-      <View style={styles.cardWrapper}>
-        <ProductCard product={item} />
-      </View>
-    );
+    return <ProductCard product={item} />;
   };
 
   const renderOtherItem = ({item}: any) => {
@@ -315,15 +250,17 @@ const IndustriesView = ({route}) => {
               </Pressable>
 
               {/* Download Brochure */}
-              {uploadedFiles && uploadedFiles.length > 0 && (
-                <Pressable
-                  style={styles.downloadBtn}
-                  onPress={() => downloadFile(uploadedFiles[0])}>
-                  {/* // <Pressable style={styles.downloadBtn}> */}
-                  {/* <Ionicons name="document-text" size={20} color="#E5252A" /> */}
-                  <Text style={styles.downloadText}>Download Brochure</Text>
-                </Pressable>
-              )}
+
+              <Pressable
+                style={styles.downloadBtn}
+                onPress={() => {
+                  setCaseFormOpen(true);
+                  setSelectedCaseStudyData(industry ?? null);
+                }}>
+                {/* <Pressable style={styles.downloadBtn}> */}
+                {/* <Ionicons name="document-text" size={20} color="#E5252A" /> */}
+                <Text style={styles.downloadText}>Download Brochure</Text>
+              </Pressable>
             </View>
           </View>
 
@@ -335,7 +272,7 @@ const IndustriesView = ({route}) => {
           {/* FILTRATION IMAGE */}
           <View style={styles.processSection}>
             <Text style={styles.subTitle}>
-              NIRAN&apos;s Solutions for the {industry?.name || ''} Filtration
+              NIRAN&apos;s Solutions for the {industrie?.name || ''} Filtration
               Process
             </Text>
 
@@ -349,26 +286,27 @@ const IndustriesView = ({route}) => {
               </View>
             ) : null}
 
-            <Text style={styles.secondaryText}>{industry?.para3}</Text>
+            <Text style={styles.secondaryText}>{industrie?.para3}</Text>
           </View>
         </View>
 
-        {relatedProductsFilteredByActive.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.title}>Related Products</Text>
+        {relatedProductsFilteredByActive &&
+          relatedProductsFilteredByActive.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.title}>Related Products</Text>
 
-            <FlatList
-              data={relatedProductsFilteredByActive}
-              key={NUM_COLUMNS} // forces re-render on column change
-              keyExtractor={item => String(item.id)}
-              renderItem={renderItem}
-              numColumns={NUM_COLUMNS}
-              columnWrapperStyle={NUM_COLUMNS > 1 ? styles.row : undefined}
-              contentContainerStyle={styles.grid}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        )}
+              <FlatList
+                data={relatedProductsFilteredByActive}
+                key={NUM_COLUMNS}
+                keyExtractor={item => String(item.id)}
+                renderItem={renderItem}
+                numColumns={NUM_COLUMNS}
+                columnWrapperStyle={NUM_COLUMNS > 1 ? styles.row : undefined}
+                contentContainerStyle={styles.grid}
+                showsVerticalScrollIndicator={false}
+              />
+            </View>
+          )}
 
         {otherIndustriesFilteredByActive &&
           otherIndustriesFilteredByActive.length > 0 && (
@@ -388,10 +326,8 @@ const IndustriesView = ({route}) => {
 
         {blogsData && blogsData?.length > 0 && (
           <View style={styles.section}>
-            {/* TITLE */}
             <Text style={styles.title}>Blogs</Text>
 
-            {/* HORIZONTAL LIST */}
             <FlatList
               data={blogsData}
               keyExtractor={(item, index) => `${item.id}-${index}`}
@@ -407,12 +343,11 @@ const IndustriesView = ({route}) => {
           <View style={styles.section}>
             <Text style={styles.title}>FAQ&apos;s</Text>
 
-            {faqs.map(item => {
+            {industryFaqs?.map(item => {
               const isOpen = openId === item.id;
 
               return (
                 <View key={item.id} style={styles.itemWrapper}>
-                  {/* QUESTION */}
                   <Pressable
                     onPress={() => toggle(item.id)}
                     style={styles.question}>
@@ -420,7 +355,6 @@ const IndustriesView = ({route}) => {
                     <Text style={styles.icon}>{isOpen ? '−' : '+'}</Text>
                   </Pressable>
 
-                  {/* ANSWER */}
                   {isOpen && (
                     <View style={styles.answerWrapper}>
                       <Text style={styles.answerText}>
@@ -434,9 +368,9 @@ const IndustriesView = ({route}) => {
           </View>
         )}
 
-        {industryTestimonials.length > 0 && (
+        {industryTestimonial && industryTestimonial.length > 0 && (
           <View style={styles.testimonialWrapper}>
-            <TestimonialSection testimonialData={industryTestimonials} />
+            <TestimonialSection testimonialData={industryTestimonial} />
           </View>
         )}
       </ScrollView>
@@ -479,21 +413,73 @@ const IndustriesView = ({route}) => {
             </ScrollView>
 
             {/* Footer */}
-            {/* <View style={styles.footer}>
-                  <TouchableOpacity
+            <View style={styles.footer}>
+              {/* <TouchableOpacity
                     onPress={handleSubmit}
                     style={styles.primaryButton}>
                     <Text style={styles.buttonText}>Submit</Text>
                   </TouchableOpacity>
-    
-                  <TouchableOpacity
-                    onPress={() => setEnquiryFormOpen(false)}
-                    style={styles.primaryButton}>
-                    <Text style={styles.buttonText}>Close</Text>
-                  </TouchableOpacity>
-                </View> */}
+     */}
+              <TouchableOpacity
+                onPress={() => setEnquiryFormOpen(false)}
+                style={styles.primaryButton}>
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
+      </Modal>
+
+      <Modal
+        visible={caseFormOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {}} // disables back button close (Android)
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.overlay}>
+          {/* Backdrop */}
+          <View style={styles.backdrop} />
+
+          {/* Dialog */}
+          <View style={styles.dialog}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Product Brochure</Text>
+            </View>
+
+            {/* Body */}
+            <ScrollView
+              style={styles.content}
+              showsVerticalScrollIndicator={false}>
+              <IndustryDownloadCaseForm
+                setCaseFormOpen={setCaseFormOpen}
+                selectedCaseStudyData={
+                  selectedCaseStudyData || (industry as any)
+                }
+              />
+            </ScrollView>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Pressable
+                onPress={() => setCaseFormOpen(false)}
+                style={styles.button}>
+                <Text style={styles.buttonText}>Close</Text>
+              </Pressable>
+
+              {/* <Pressable
+                      onPress={() => {
+                        // trigger submit inside form
+                        // usually passed via prop or ref
+                      }}
+                      style={styles.button}>
+                      <Text style={styles.buttonText}>Submit</Text>
+                    </Pressable> */}
+            </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );
@@ -522,9 +508,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0D6EFD',
   },
+  button: {
+    backgroundColor: '#006da8', // var(--color-tertiary)
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
   itemWrapper: {
     marginBottom: 12,
   },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+
+  dialog: {
+    width: '90%',
+    maxHeight: '85%',
+    backgroundColor: '#f0f6fb', // var(--color-primary-light)
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+
   actions: {
     flexDirection: 'row',
     gap: 12,

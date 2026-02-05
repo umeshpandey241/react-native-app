@@ -58,7 +58,6 @@ function EnquiryForm({
   setEnquiryFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
   products: Product[];
   industries: Industrie[];
-  loadingData: boolean;
 }) {
   const {t} = useTranslation();
   const stepRefs = useRef<HTMLDivElement[]>([]);
@@ -604,11 +603,11 @@ function EnquiryForm({
         </TouchableOpacity>
 
         {/* Close */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setEnquiryFormOpen(false)}
           style={styles.actionButton}>
           <Text style={styles.actionText}>Close</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </ScrollView>
   );

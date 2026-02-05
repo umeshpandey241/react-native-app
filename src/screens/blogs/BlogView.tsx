@@ -13,7 +13,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
 
 const {width} = Dimensions.get('window');
@@ -26,8 +26,9 @@ interface BlogCategoryDetails {
   totalBlogs: string;
 }
 
-const BlogView = ({route}) => {
-  const {slug, id} = route.params;
+const BlogView = () => {
+  const route = useRoute();
+  const {slug, id}: any = route.params;
 
   const [blogsData, setBlogsData] = useState<Blog[]>([]);
   const [blogCategoriesData, setBlogCategoriesData] = useState<

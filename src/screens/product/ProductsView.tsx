@@ -13,6 +13,9 @@ import {
   UIManager,
   TouchableOpacity,
   Modal,
+  Alert,
+  Linking,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
@@ -33,6 +36,8 @@ import {
   getIndustryByProductId,
 } from '../../core/service/industries.service';
 import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
+import {PermissionsAndroid} from 'react-native';
+import ProductDownloadCaseForm from './ProductDownloadCaseForm';
 
 interface variantProduct {
   featureBenifit: string;
@@ -110,6 +115,9 @@ const ProductView = ({route}) => {
   const [uploadedFiles, setUploadedFiles] = useState<CustomFile[]>(
     parseAndFormatImages(mainProduct?.brochure ?? null),
   );
+  const [caseFormOpen, setCaseFormOpen] = useState(false);
+  const [selectedCaseStudyData, setSelectedCaseStudyData] =
+    useState<Product | null>(null);
 
   console.log(industries, 'industries');
 
@@ -196,23 +204,75 @@ const ProductView = ({route}) => {
     setActiveId(prev => (prev === id ? null : id));
   };
 
+  const requestAndroidPermission = async () => {
+    if (Platform.OS !== 'android') return true;
+
+    // ✅ Android 10+ → NO permission needed
+    if (Platform.Version >= 29) {
+      return true;
+    }
+
+    // ✅ Android 9 and below
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: 'Storage Permission',
+        message: 'App needs access to storage to download files',
+        buttonPositive: 'OK',
+      },
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  };
+
   const downloadFile = async (file: CustomFile) => {
     try {
-      const response = await fileDownload(file);
-      if (!response) {
-        throw new Error('Download function returned no data');
+      if (!file?.filePath) {
+        throw new Error('filePath missing');
       }
-      const base64Data = Buffer.from(response).toString('base64');
-      const filePath = `${RNFS.DownloadDirectoryPath}/${file.fileName}`;
-      await RNFS.writeFile(filePath, base64Data, 'base64');
-      console.log('File downloaded at:', filePath);
-    } catch (error) {
-      console.error('Download failed:', error);
+
+      const fileUrl = getPhotoUrl(file.filePath);
+      console.log('DOWNLOAD URL:', fileUrl);
+
+      if (!fileUrl || !fileUrl.startsWith('http')) {
+        throw new Error('Invalid download URL');
+      }
+
+      const hasPermission = await requestAndroidPermission();
+      if (!hasPermission) {
+        Alert.alert('Permission denied');
+        return;
+      }
+
+      const fileName = file.fileName || `brochure_${Date.now()}.pdf`;
+
+      const downloadPath =
+        Platform.OS === 'android'
+          ? `${RNFS.DownloadDirectoryPath}/${fileName}`
+          : `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+      const result = await RNFS.downloadFile({
+        fromUrl: fileUrl,
+        toFile: downloadPath,
+      }).promise;
+
+      if (result.statusCode !== 200) {
+        throw new Error(`HTTP ${result.statusCode}`);
+      }
+
+      if (Platform.OS === 'android') {
+        Alert.alert('Download complete', 'Saved in Downloads folder');
+      } else {
+        Alert.alert('Download complete', 'Opening file...');
+        Linking.openURL(`file://${downloadPath}`);
+      }
+    } catch (err: any) {
+      console.error('DOWNLOAD ERROR:', err);
+      Alert.alert('Download failed', err.message);
     }
   };
-  const renderItem = ({item}: any) => {
-    // const imageUrl = getPhotoUrl(item.image);
 
+  const renderItem = ({item}: any) => {
     return (
       <View style={styles.cardWrapper}>
         <ProductCard product={item} />
@@ -240,7 +300,6 @@ const ProductView = ({route}) => {
                   )}
                 </View>
 
-                {/* THUMBNAILS */}
                 {thumbImages?.length > 1 && (
                   <FlatList
                     data={thumbImages}
@@ -267,13 +326,11 @@ const ProductView = ({route}) => {
               </View>
             </View>
 
-            {/* RIGHT – CONTENT */}
             <View style={styles.contentCol}>
               <Text style={styles.title}>{mainProduct?.name}</Text>
 
               <Text style={styles.description}>{mainProduct?.mainContent}</Text>
 
-              {/* ACTIONS */}
               <View style={styles.actions}>
                 <Pressable
                   style={styles.enquiryBtn}
@@ -284,14 +341,16 @@ const ProductView = ({route}) => {
                 {/* {uploadedFiles?.length > 0 && ( */}
                 <Pressable
                   style={styles.downloadBtn}
-                  onPress={() => downloadFile(uploadedFiles[0])}>
+                  onPress={() => {
+                    setCaseFormOpen(true);
+                    setSelectedCaseStudyData(mainProduct ?? null);
+                  }}>
                   <Ionicons name="document-text" size={18} color="#E5252A" />
                   <Text style={styles.downloadText}>Download Brochure</Text>
                 </Pressable>
                 {/* )} */}
               </View>
 
-              {/* CONTACT */}
               <View style={styles.contact}>
                 <Text style={styles.contactText}>
                   Any questions? Please feel free to reach us at{' '}
@@ -300,7 +359,6 @@ const ProductView = ({route}) => {
                 <View style={styles.divider} />
               </View>
 
-              {/* RELATED INDUSTRIES */}
               {productIndustry?.length > 0 && (
                 <View>
                   <Text style={styles.subTitle}>Related Industries</Text>
@@ -440,7 +498,7 @@ const ProductView = ({route}) => {
 
           <FlatList
             data={similarProductsFilteredByActive}
-            key={NUM_COLUMNS} // important for layout recalculation
+            key={NUM_COLUMNS}
             numColumns={NUM_COLUMNS}
             renderItem={renderItem}
             keyExtractor={item => String(item.id)}
@@ -456,7 +514,7 @@ const ProductView = ({route}) => {
 
             <FlatList
               data={otherProductsData}
-              key={NUM_COLUMNS} // important for layout recalculation
+              key={NUM_COLUMNS}
               numColumns={NUM_COLUMNS}
               keyExtractor={item => String(item.id)}
               showsVerticalScrollIndicator={false}
@@ -532,7 +590,6 @@ const ProductView = ({route}) => {
               </TouchableOpacity>
             </View>
 
-            {/* Scrollable Body */}
             <ScrollView
               style={styles.body}
               showsVerticalScrollIndicator
@@ -547,21 +604,73 @@ const ProductView = ({route}) => {
             </ScrollView>
 
             {/* Footer */}
-            {/* <View style={styles.footer}>
-              <TouchableOpacity
+            <View style={styles.footer}>
+              {/* <TouchableOpacity
                 onPress={handleSubmit}
                 style={styles.primaryButton}>
                 <Text style={styles.buttonText}>Submit</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TouchableOpacity
                 onPress={() => setEnquiryFormOpen(false)}
                 style={styles.primaryButton}>
                 <Text style={styles.buttonText}>Close</Text>
               </TouchableOpacity>
-            </View> */}
+            </View>
           </View>
         </View>
+      </Modal>
+
+      <Modal
+        visible={caseFormOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {}} // disables back button close (Android)
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.overlay}>
+          {/* Backdrop */}
+          <View style={styles.backdrop} />
+
+          {/* Dialog */}
+          <View style={styles.dialog}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Product Brochure</Text>
+            </View>
+
+            {/* Body */}
+            <ScrollView
+              style={styles.content}
+              showsVerticalScrollIndicator={false}>
+              <ProductDownloadCaseForm
+                setCaseFormOpen={setCaseFormOpen}
+                selectedCaseStudyData={
+                  selectedCaseStudyData || (mainProduct as any)
+                }
+              />
+            </ScrollView>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Pressable
+                onPress={() => setCaseFormOpen(false)}
+                style={styles.button}>
+                <Text style={styles.buttonText}>Close</Text>
+              </Pressable>
+
+              {/* <Pressable
+                onPress={() => {
+                  // trigger submit inside form
+                  // usually passed via prop or ref
+                }}
+                style={styles.button}>
+                <Text style={styles.buttonText}>Submit</Text>
+              </Pressable> */}
+            </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );
@@ -577,8 +686,6 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: IS_TABLET ? 'row' : 'column',
-    gap: 24,
-    marginTop: 20,
   },
 
   imageCol: {flex: 1},
@@ -588,6 +695,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#002438',
     borderRadius: 12,
     padding: 16,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  dialog: {
+    width: '90%',
+    maxHeight: '85%',
+    backgroundColor: '#f0f6fb', // var(--color-primary-light)
+    borderRadius: 16,
+    overflow: 'hidden',
   },
 
   imageCenter: {
@@ -956,5 +1074,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  button: {
+    backgroundColor: '#006da8', // var(--color-tertiary)
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
 });

@@ -270,5 +270,17 @@ export const SidebarStyles = () => {
       borderTopWidth: 1,
       borderColor: 'var(--color-border)',
     },
+    primaryButton: {
+      backgroundColor: '#0b6fae',
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+
+    buttonText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
   });
 };

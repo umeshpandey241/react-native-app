@@ -12,7 +12,7 @@ import {
 // import LinearGradient from 'react-native-linear-gradient';
 import {OurClient} from '../../core/model/ourClient';
 import {getPhotoUrl} from '../product/ProductList';
-// import {useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
@@ -24,7 +24,7 @@ export default function OurClientSection({ourClientsData}: Props) {
   const filteredByActive = ourClientsData?.filter(
     item => item.isActive === true,
   );
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const repeatedClients = Array(4).fill(filteredByActive).flat();
 
@@ -86,8 +86,7 @@ export default function OurClientSection({ourClientsData}: Props) {
       {/* CTA */}
       <TouchableOpacity
         style={styles.cta}
-        // onPress={() => navigation.navigate('OurClients')}
-      >
+        onPress={() => navigation.navigate('OurClientsHome')}>
         <Text style={styles.ctaText}>View All ↗</Text>
       </TouchableOpacity>
     </View>

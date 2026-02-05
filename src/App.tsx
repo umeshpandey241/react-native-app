@@ -41,6 +41,7 @@ import CareersHome from './screens/career/CareersHome';
 import HomesHome from './screens/home/HomesHome';
 import Search from './screens/search/Search';
 import ContactsHome from './screens/contacts/ContactsHome';
+import OurClientsHome from './screens/ourClients/OurClientsHome';
 
 /* <!--router-link-admin-Import--> */
 
@@ -80,6 +81,7 @@ export type RootStackParamList = {
   CaseStudiesList: undefined;
   CareersHome: undefined;
   ContactsHome: undefined;
+  OurClientsHome: undefined;
   Search: {slug: string};
 
   //<!--router-link-admin-Export-->
@@ -193,6 +195,10 @@ const App = (): React.JSX.Element => {
                 />
                 <Stack.Screen name="CareersHome" component={CareersHome} />
                 <Stack.Screen name="ContactsHome" component={ContactsHome} />
+                <Stack.Screen
+                  name="OurClientsHome"
+                  component={OurClientsHome}
+                />
                 <Stack.Screen name="Search" component={Search} />
               </Stack.Navigator>
             </NavigationContainer>

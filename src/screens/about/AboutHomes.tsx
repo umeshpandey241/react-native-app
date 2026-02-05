@@ -20,6 +20,9 @@ import {Animated} from 'react-native';
 
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import {ResearchDevelopment} from '../../core/model/researchDevelopment';
+import {Leadership} from '../../core/model/leadership';
+import {OurVideo} from '../../core/model/ourVideo';
 
 export interface CustomFile {
   fileName: string;
@@ -58,15 +61,15 @@ export default function AboutSection() {
   //   'mission',
   // );
 
-  const [research, setResearch] = useState([]);
-  const [team, setTeam] = useState([]);
-  const [video, setVideo] = useState([]);
+  const [research, setResearch] = useState<ResearchDevelopment[]>([]);
+  const [team, setTeam] = useState<Leadership[]>([]);
+  const [video, setVideo] = useState<OurVideo[]>([]);
   const ripple1 = useRef(new Animated.Value(0)).current;
   const ripple2 = useRef(new Animated.Value(0)).current;
   const ripple3 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const makeRipple = (anim, delay) =>
+    const makeRipple = (anim: any, delay: any) =>
       Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
@@ -88,7 +91,7 @@ export default function AboutSection() {
     makeRipple(ripple3, 1200);
   }, [ripple1, ripple2, ripple3]);
 
-  const rippleStyle = anim => ({
+  const rippleStyle = (anim: any) => ({
     transform: [
       {
         scale: anim.interpolate({
@@ -181,7 +184,7 @@ export default function AboutSection() {
   ];
 
   // eslint-disable-next-line react/no-unstable-nested-components
-  function AdvantageCard({icon, title, text}) {
+  function AdvantageCard({icon, title, text}: any) {
     return (
       <View style={styles.advantageCard}>
         <View style={styles.icon}>{icon}</View>
@@ -357,7 +360,8 @@ export default function AboutSection() {
                         </View>
                       ))
                     ) : (
-                      <Text style={styles.cardText}>{item.description}</Text>
+                      // <Text style={styles.cardText}>{item.description}</Text>
+                      <Text style={styles.cardText}>NO items</Text>
                     )}
                   </View>
                 </View>

@@ -102,7 +102,7 @@ function JobRequestForm({
     Record<string, {isValid: boolean; error?: string}>
   >({});
 
-  const [jobVacancys, setJobVacancys] = useState<JobVacancy>([]);
+  const [jobVacancys, setJobVacancys] = useState<JobVacancy[]>([]);
   const inputRefs = useRef<{name: string; required: boolean}[]>([]);
 
   console.log(errors, 'errors');

@@ -11,9 +11,11 @@ import RenderHTML from 'react-native-render-html';
 import {EventData} from '../../core/model/eventData';
 import {getById} from '../../core/service/eventDatas.service';
 import {getPhotoUrl} from '../product/ProductList';
+import {useRoute} from '@react-navigation/native';
 
-const EventDatasView = ({route}) => {
-  const {id, slug} = route.params;
+const EventDatasView = () => {
+  const route = useRoute();
+  const {id, slug}: any = route.params;
   const {width} = useWindowDimensions();
 
   const [eventDataData, setEventDataData] = useState<EventData | null>(null);

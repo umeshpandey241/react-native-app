@@ -2,23 +2,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState, useRef} from 'react';
 import {RootStackParamList} from '../App';
-import {useAuthStore} from '../store/auth.store';
 import {SidebarStyles} from '../styles/SidebarStyles';
 import {useTheme} from '../theme/ThemeContext';
 import {
-  Alert,
+  // Alert,
   Animated,
   AsyncStorage,
   Dimensions,
-  // Image,
-  InAppReview,
-  Linking,
   MaterialCommunityIcons,
   Modal,
   NativeStackNavigationProp,
   Platform,
-  // SafeAreaView,
-  // ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -28,7 +22,6 @@ import {
 } from '../sharedBase/globalImport';
 import {useLanguageStore} from '../store/useLanguage.store';
 import Collapsible from 'react-native-collapsible';
-// import {useFetchRoleDetailsData} from '../sharedBase/lookupService';
 import {StatusBar, TextInput} from 'react-native';
 import FormFieldError from './FormFieldError';
 import {getAll as getAllProducts} from '../core/service/products.service';
@@ -36,6 +29,7 @@ import {getAll as getAllIndustries} from '../core/service/industries.service';
 import {searchValidate} from '../schema/search';
 import {ScrollView} from 'react-native';
 import EnquiryForm from './EnquiryForm';
+import {getNavbarData} from '../core/service/homes.service';
 
 type NavigationProps = NativeStackNavigationProp<
   RootStackParamList,
@@ -53,18 +47,16 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
   const {t, i18n} = useTranslation();
   const searchSchema = searchValidate(t);
   const navigation = useNavigation<NavigationProps>();
-  const login = useAuthStore(state => state.login);
-  // const [roleData, setRoleData] = useState<any>([]);
   const {mode, toggleTheme, theme} = useTheme();
   const {selectedLanguage, setLanguage} = useLanguageStore();
-  const [loginUserInfo, setLoginUserInfo] = useState<any>();
   const slideAnim = useRef(new Animated.Value(-300)).current;
   // const androidPackageName = 'com.banquetwazl';
   const styles = SidebarStyles();
-  const [isLangCollapsed, setIsLangCollapsed] = useState(true);
-  // const [isThemeCollapsed, setIsThemeCollapsed] = useState(true);
+  const [isProductCollapsed, setIsProductCollapsed] = useState(true);
+  const [isIndustryCollapsed, setIsIndustryCollapsed] = useState(true);
+  const [isResourseCollapsed, setIsResourseCollapsed] = useState(true);
+  const [isIndustriesCollapsed, setIsIndustriesCollapsed] = useState(true);
   const [activeButton, setActiveButton] = useState<string | null>(null);
-  //   const {data: roleDetailsData} = useFetchRoleDetailsData();
   const [openSearchBox, setOpenSearchBox] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -72,37 +64,12 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
   const [industries, setIndustries] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [enquiryFormOpen, setEnquiryFormOpen] = useState(false);
-  const [loadingData, setLoadingData] = useState(false);
   const [open, setOpen] = useState(false);
-
-  const androidPackageName = 'com.standalonern';
-  const iosAppId = '310633997';
-
-  // const rateApp = () => {
-  //   if (Platform.OS === 'android') {
-  //     if (InAppReview.isAvailable()) {
-  //       InAppReview.RequestInAppReview()
-  //         .then(hasFlowFinishedSuccessfully => {
-  //           if (!hasFlowFinishedSuccessfully) {
-  //             Linking.openURL(`market://details?id=${androidPackageName}`);
-  //           }
-  //         })
-  //         .catch(error => console.log(error));
-  //     } else {
-  //       Linking.openURL(`market://details?id=${androidPackageName}`);
-  //     }
-  //   } else if (Platform.OS === 'ios') {
-  //     Linking.openURL(
-  //       `itms-apps://itunes.apple.com/app/id${iosAppId}?action=write-review`,
-  //     );
-  //   } else {
-  //     Alert.alert(
-  //       'Unsupported Platform',
-  //       'Rating is only available on Android and iOS.',
-  //     );
-  //   }
-  //   navigation.navigate('AppUserHome');
-  // };
+  const [navData, setNavData] = useState<any>(null);
+  const [loadingData] = useState(false);
+  const [isSelected, setIsSelected] = useState<Boolean>(false);
+  // const androidPackageName = 'com.standalonern';
+  // const iosAppId = '310633997';
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -119,40 +86,22 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
   }, []);
 
   useEffect(() => {
-    const getUserInfo = async () => {
-      try {
-        const userInfo = await AsyncStorage.getItem('userInfo');
-        if (userInfo) {
-          setLoginUserInfo(JSON.parse(userInfo));
-        }
-      } catch (error) {
-        console.error('Error getting user info:', error);
-      }
+    const loadNav = async () => {
+      const data = await getNavbarData();
+      setNavData(data);
     };
-    getUserInfo();
+    loadNav();
   }, []);
+
+  const productList = navData?.product || [];
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isVisible ? 0 : -width, // full screen width off-screen
+      toValue: isVisible ? 0 : -width,
       duration: 300,
       useNativeDriver: true,
     }).start();
   }, [isVisible]);
-
-  //   useEffect(() => {
-  //     const getRoleData = async () => {
-  //       try {
-  //         if (roleDetailsData && roleDetailsData.length > 0) {
-  //           setRoleData(roleDetailsData);
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching role data:', error);
-  //       }
-  //     };
-
-  //     getRoleData();
-  //   }, []);
 
   const handleSearchData = () => {
     if (isSubmitting) return;
@@ -182,29 +131,11 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
     }
   };
 
-  const handleLogout = () => {
-    login('');
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'LoginPage'}],
-    });
-    onClose();
-  };
-
-  // const hasAccessToPage = (pageName: string) => {
-  //   return roleData.some(
-  //     (action: any) => action.name.toLowerCase() === pageName.toLowerCase(),
-  //   );
-  // };
-
-  const handleNavigation = (path: string, pageName: string) => {
-    // if (hasAccessToPage(pageName)) {
+  const handleNavigation = (path: string) => {
     navigation.navigate({name: path as keyof RootStackParamList} as any);
-    // } else {
-    //     navigation.navigate('NotAuthorized');
-    // }
     onClose();
   };
+
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
   }, [selectedLanguage]);
@@ -215,28 +146,6 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
     AsyncStorage.setItem('app_language', language);
   };
 
-  // const hasAccess = (roleData: any, requiredAction: string) => {
-  //     if (!roleData) { return false; }
-
-  //     const actions = typeof roleData.action === 'string' ? JSON.parse(roleData.action) : [];
-
-  //     return actions.some((action: any) => action.name.toLowerCase() === requiredAction.toLowerCase());
-  // };
-
-  // const themeOptions = [
-  //   {label: 'Light Theme', value: 'light'},
-  //   {label: 'Dark Theme', value: 'dark'},
-  //   {label: 'Blue Theme', value: 'blue'},
-  //   {label: 'Green Theme', value: 'green'},
-  //   {label: 'Purple Theme', value: 'purple'},
-  //   {label: 'Red Theme', value: 'red'},
-  //   {label: 'Orange Theme', value: 'orange'},
-  // ];
-  // const languageOptions = [
-  //   {label: t('globals.english'), value: 'en'},
-  //   {label: t('globals.hindi'), value: 'hi'},
-  //   {label: t('globals.marathi'), value: 'mr'},
-  // ];
   const resourcesOptions = [
     {label: 'Blogs', value: 'BlogList'},
     {label: 'Events', value: 'EventList'},
@@ -281,31 +190,6 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                       Platform.OS === 'android' ? StatusBar.currentHeight : 40,
                     paddingBottom: 80,
                   }}>
-                  <View style={styles.userDetail}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
-                      {/* <Image
-                      source={require('../assets/images/user3.jpeg')}
-                      style={styles.image}
-                    /> */}
-                      <Text style={styles.name}>
-                        {loginUserInfo?.firstName}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={onClose}
-                      style={styles.closeButton}>
-                      <MaterialCommunityIcons
-                        name="close"
-                        size={24}
-                        style={styles.primaryColor}
-                      />
-                    </TouchableOpacity>
-                  </View>
                   <TouchableOpacity
                     onPress={() =>
                       handleNavigationWithActive('HomesHome', 'Home')
@@ -343,32 +227,6 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                   </TouchableOpacity>
 
                   {/* <TouchableOpacity
-                  onPress={() =>
-                    handleNavigationWithActive(
-                      'AppUserTestsList',
-                      'AppUserTests',
-                    )
-                  }
-                  style={[
-                    styles.menu,
-                    activeButton === 'AppUserTestsList'
-                      ? styles.activeButton
-                      : null,
-                  ]}>
-                  <View style={{flexDirection: 'row'}}>
-                    <MaterialCommunityIcons
-                      name="account-outline"
-                      size={24}
-                      style={styles.primaryColor}
-                    />
-                    <Text style={styles.menuItem}>
-                      {t('appUserTests.form_detail.fields.modelname')}{' '}
-                      {t('globals.list')}
-                    </Text>
-                  </View>
-                </TouchableOpacity> */}
-
-                  <TouchableOpacity
                     onPress={() =>
                       handleNavigationWithActive('ProductList', 'Product')
                     }
@@ -402,12 +260,280 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                       />
                       <Text style={styles.menuItem}>Industries</Text>
                     </View>
+                  </TouchableOpacity> */}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleButtonPress('product', () =>
+                        setIsProductCollapsed(!isProductCollapsed),
+                      )
+                    }
+                    style={[
+                      styles.menu,
+                      activeButton === 'Product' && styles.activeButton,
+                    ]}>
+                    <View style={styles.menuRow}>
+                      {/* LEFT ICON + TEXT */}
+                      <View style={styles.leftContent}>
+                        <MaterialCommunityIcons
+                          name="package-variant-closed"
+                          size={24}
+                          style={styles.primaryColor}
+                        />
+                        <Text style={styles.menuItem}>Product</Text>
+                      </View>
+
+                      {/* RIGHT DROPDOWN ICON */}
+                      <MaterialCommunityIcons
+                        name={
+                          isProductCollapsed ? 'chevron-down' : 'chevron-up'
+                        }
+                        size={22}
+                        color="#6B7280"
+                      />
+                    </View>
                   </TouchableOpacity>
+
+                  <Collapsible
+                    collapsed={isProductCollapsed}
+                    style={[activeButton === 'Product' && styles.activeButton]}>
+                    {productList.map((item: any) => {
+                      return (
+                        <TouchableOpacity
+                          key={item.id}
+                          onPress={() => {
+                            navigation.navigate('ProductView', {
+                              slug: item.slug,
+                            });
+                          }}
+                          style={[
+                            {paddingVertical: 5, paddingLeft: 34},
+                            isSelected && {
+                              backgroundColor: '#ffff',
+                              borderRadius: 5,
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              styles.menuItem,
+                              {
+                                paddingVertical: 5,
+                                paddingLeft: 34,
+                                color: isSelected ? 'black' : theme.text,
+                                fontWeight: isSelected ? 'bold' : 'normal',
+                              },
+                            ]}>
+                            {item.name}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </Collapsible>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleButtonPress('Industries', () =>
+                        setIsIndustryCollapsed(!isIndustryCollapsed),
+                      )
+                    }
+                    style={[
+                      styles.menu,
+
+                      activeButton === 'Industries' && styles.activeButton,
+                    ]}>
+                    <View style={styles.menuRow}>
+                      {/* LEFT ICON + TEXT */}
+                      <View style={styles.leftContent}>
+                        <MaterialCommunityIcons
+                          name="trash-can"
+                          size={24}
+                          style={styles.primaryColor}
+                        />
+                        <Text style={styles.menuItem}>Industries</Text>
+                      </View>
+
+                      {/* RIGHT DROPDOWN ICON */}
+                      <MaterialCommunityIcons
+                        name={
+                          isIndustryCollapsed ? 'chevron-down' : 'chevron-up'
+                        }
+                        size={22}
+                        color="#6B7280"
+                      />
+                    </View>
+                  </TouchableOpacity>
+
+                  <Collapsible
+                    collapsed={isIndustryCollapsed}
+                    style={[
+                      activeButton === 'Industries' && styles.activeButton,
+                    ]}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleButtonPress('Food', () =>
+                          setIsIndustriesCollapsed(!isIndustriesCollapsed),
+                        );
+                      }}
+                      style={[
+                        {paddingVertical: 5, paddingLeft: 34},
+                        isSelected && {
+                          backgroundColor: '#ffff',
+                          borderRadius: 5,
+                        },
+                      ]}>
+                      <View style={styles.menuRow}>
+                        <View style={styles.leftContent}>
+                          <Text
+                            style={[
+                              styles.menuItem,
+                              {
+                                paddingVertical: 5,
+                                paddingLeft: 34,
+                                color: isSelected ? 'black' : theme.text,
+                                fontWeight: isSelected ? 'bold' : 'normal',
+                              },
+                            ]}>
+                            Food & Bevrages
+                          </Text>
+                        </View>
+
+                        {/* RIGHT DROPDOWN ICON */}
+                        <MaterialCommunityIcons
+                          name={
+                            isIndustriesCollapsed
+                              ? 'chevron-down'
+                              : 'chevron-up'
+                          }
+                          size={22}
+                          color="#6B7280"
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    <Collapsible
+                      collapsed={isIndustriesCollapsed}
+                      style={[
+                        activeButton === 'Product' && styles.activeButton,
+                      ]}>
+                      {navData?.foodBeverages
+                        ?.slice()
+                        ?.sort((a: any, b: any) => a.name.localeCompare(b.name))
+                        ?.map((item: any) => {
+                          return (
+                            <TouchableOpacity
+                              key={item.id}
+                              onPress={() => {
+                                navigation.navigate('IndustriesView', {
+                                  slug: item.slug,
+                                });
+                              }}
+                              style={[
+                                {paddingVertical: 5, paddingLeft: 34},
+                                isSelected && {
+                                  backgroundColor: '#ffff',
+                                  borderRadius: 5,
+                                },
+                              ]}>
+                              <Text
+                                style={[
+                                  styles.menuItem,
+                                  {
+                                    paddingVertical: 5,
+                                    paddingLeft: 34,
+                                    color: isSelected ? 'black' : theme.text,
+                                    fontWeight: isSelected ? 'bold' : 'normal',
+                                  },
+                                ]}>
+                                {item.name}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                    </Collapsible>
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleButtonPress('Meds', () =>
+                          setIsIndustriesCollapsed(!isIndustriesCollapsed),
+                        );
+                      }}
+                      style={[
+                        {paddingVertical: 5, paddingLeft: 34},
+                        isSelected && {
+                          backgroundColor: '#ffff',
+                          borderRadius: 5,
+                        },
+                      ]}>
+                      <View style={styles.menuRow}>
+                        <View style={styles.leftContent}>
+                          <Text
+                            style={[
+                              styles.menuItem,
+                              {
+                                paddingVertical: 5,
+                                paddingLeft: 34,
+                                color: isSelected ? 'black' : theme.text,
+                                fontWeight: isSelected ? 'bold' : 'normal',
+                              },
+                            ]}>
+                            pharmaceuticals
+                          </Text>
+                        </View>
+
+                        {/* RIGHT DROPDOWN ICON */}
+                        <MaterialCommunityIcons
+                          name={
+                            isIndustriesCollapsed
+                              ? 'chevron-down'
+                              : 'chevron-up'
+                          }
+                          size={22}
+                          color="#6B7280"
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    <Collapsible
+                      collapsed={isIndustriesCollapsed}
+                      style={[activeButton === 'Meds' && styles.activeButton]}>
+                      {navData?.pharmaceuticals
+                        ?.slice()
+                        ?.sort((a: any, b: any) => a.name.localeCompare(b.name))
+                        ?.map((item: any) => {
+                          return (
+                            <TouchableOpacity
+                              key={item.id}
+                              onPress={() => {
+                                navigation.navigate('IndustriesView', {
+                                  slug: item.slug,
+                                });
+                              }}
+                              style={[
+                                {paddingVertical: 5, paddingLeft: 34},
+                                isSelected && {
+                                  backgroundColor: '#ffff',
+                                  borderRadius: 5,
+                                },
+                              ]}>
+                              <Text
+                                style={[
+                                  styles.menuItem,
+                                  {
+                                    paddingVertical: 5,
+                                    paddingLeft: 34,
+                                    color: isSelected ? 'black' : theme.text,
+                                    fontWeight: isSelected ? 'bold' : 'normal',
+                                  },
+                                ]}>
+                                {item.name}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                    </Collapsible>
+                  </Collapsible>
 
                   <TouchableOpacity
                     onPress={() =>
                       handleButtonPress('resources', () =>
-                        setIsLangCollapsed(!isLangCollapsed),
+                        setIsResourseCollapsed(!isResourseCollapsed),
                       )
                     }
                     style={[
@@ -427,7 +553,9 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
 
                       {/* RIGHT DROPDOWN ICON */}
                       <MaterialCommunityIcons
-                        name={isLangCollapsed ? 'chevron-down' : 'chevron-up'}
+                        name={
+                          isResourseCollapsed ? 'chevron-down' : 'chevron-up'
+                        }
                         size={22}
                         color="#6B7280"
                       />
@@ -435,7 +563,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                   </TouchableOpacity>
 
                   <Collapsible
-                    collapsed={isLangCollapsed}
+                    collapsed={isResourseCollapsed}
                     style={[
                       activeButton === 'resources' && styles.activeButton,
                     ]}>
@@ -447,7 +575,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                           key={index}
                           onPress={() => {
                             handleLanguageChange(lang.value);
-                            setIsLangCollapsed(true);
+                            setIsResourseCollapsed(true);
                             navigation.navigate(lang.value);
                           }}
                           style={[
@@ -505,7 +633,10 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
 
                   {/* Enquiry Button */}
                   <TouchableOpacity
-                    onPress={handleOpenForm}
+                    onPress={() => {
+                      handleOpenForm();
+                      onClose();
+                    }}
                     style={styles.actionButton}>
                     <MaterialCommunityIcons
                       name="message-text-outline"
@@ -674,9 +805,23 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                 setEnquiryFormOpen={setEnquiryFormOpen}
                 products={products}
                 industries={industries}
-                loadingData={loadingData}
               />
             </ScrollView>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              {/* <TouchableOpacity
+                                onPress={handleSubmit}
+                                style={styles.primaryButton}>
+                                <Text style={styles.buttonText}>Submit</Text>
+                              </TouchableOpacity>
+                 */}
+              <TouchableOpacity
+                onPress={() => setEnquiryFormOpen(false)}
+                style={styles.primaryButton}>
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>

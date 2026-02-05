@@ -144,40 +144,34 @@ export default function DownloadCaseForm({
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}>
       {/* Name */}
-      <Text style={styles.label}>
-        {t('downloadedCases.columns.fields.name')} *
-      </Text>
+      <Text style={styles.label}>Name *</Text>
       <TextInput
         style={styles.input}
         value={formData.name}
         onChangeText={v => handleInputChange('name', v)}
-        placeholder={t('downloadedCases.columns.fields.name')}
+        placeholder={'Name'}
       />
       <FormFieldError field="name" errors={errors} />
 
       {/* Email */}
-      <Text style={styles.label}>
-        {t('downloadedCases.columns.fields.email')} *
-      </Text>
+      <Text style={styles.label}>Email *</Text>
       <TextInput
         style={styles.input}
         value={formData.email}
         onChangeText={v => handleInputChange('email', v)}
-        placeholder={t('downloadedCases.columns.fields.email')}
+        placeholder={'Email'}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <FormFieldError field="email" errors={errors} />
 
       {/* Mobile */}
-      <Text style={styles.label}>
-        {t('downloadedCases.columns.fields.mobile')} *
-      </Text>
+      <Text style={styles.label}>Mobile *</Text>
       <TextInput
         style={styles.input}
         value={formData.mobile}
         onChangeText={v => handleInputChange('mobile', v)}
-        placeholder={t('downloadedCases.columns.fields.mobile')}
+        placeholder={'Mobile'}
         keyboardType="number-pad"
         maxLength={10}
       />

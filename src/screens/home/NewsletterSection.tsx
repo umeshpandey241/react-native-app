@@ -7,7 +7,6 @@ import {
   // ImageBackground,
   TextInput,
   TouchableOpacity,
-  // Alert,
   ScrollView,
   Alert,
 } from 'react-native';
@@ -102,12 +101,13 @@ export default function NewsletterSection() {
       const cleanedPayload = removeEmptyFields(payload);
       await addData(cleanedPayload);
 
-      console.log("Thank you for subscribing. We'll keep you updated");
+      Alert.alert("Thank you for subscribing. We'll keep you updated");
       setFormData(initialFormState);
       // setTimeout(() => {
       //     router.push("/");
       // }, 2000);
     } catch (error) {
+      Alert.alert('Error submitting form');
       console.error('Error submitting form:', error);
     } finally {
       setIsSubmitting(false);

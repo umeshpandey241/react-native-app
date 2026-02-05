@@ -23,7 +23,7 @@ export default function IndustriesCard({name, image, slug}: IndustryCardProps) {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate('IndustryDetail', {slug})}
+      onPress={() => navigation.navigate('IndustriesView', {slug})}
       style={({pressed}) => [styles.card, pressed && {opacity: 0.95}]}>
       <View style={styles.imageWrapper}>
         {image ? (
