@@ -143,7 +143,7 @@ export default function ContactsHome() {
                 <TextInput
                   style={styles.input}
                   placeholder={field.placeholder}
-                  value={formData[field.key as keyof Contact]}
+                  value={String(formData[field.key as keyof Contact])}
                   onChangeText={v => handleInputChange(field.key, v)}
                   keyboardType={field.keyboard as any}
                 />

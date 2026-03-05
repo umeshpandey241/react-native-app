@@ -229,7 +229,9 @@ const IndustryDownloadCaseForm = ({
 
           {/* Submit */}
           <Pressable style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
+            <Text style={styles.buttonText}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </Text>
           </Pressable>
         </View>
       </View>

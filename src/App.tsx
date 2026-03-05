@@ -42,6 +42,11 @@ import HomesHome from './screens/home/HomesHome';
 import Search from './screens/search/Search';
 import ContactsHome from './screens/contacts/ContactsHome';
 import OurClientsHome from './screens/ourClients/OurClientsHome';
+import AppUserEdit from './screens/appuser/AppUserEdit';
+import LoginPage from './screens/auth/LoginPage';
+import CartsList from './screens/cart/CartsList';
+import WishLists from './screens/wishlists/WishLists';
+import ForgotPassword from './screens/forgetPassword/ForgetPassword';
 
 /* <!--router-link-admin-Import--> */
 
@@ -54,7 +59,8 @@ export type RootStackParamList = {
   AppUserList: undefined;
   AppUserHome: undefined;
   AppUserView: {id: any};
-  AppUserEdit: {id?: any};
+  // AppUserEdit: {id?: any};
+  AppUserEdit: undefined;
   // ProductList: undefined;
   Splash: undefined;
   Wellcome: undefined;
@@ -83,6 +89,9 @@ export type RootStackParamList = {
   ContactsHome: undefined;
   OurClientsHome: undefined;
   Search: {slug: string};
+  CartsList: undefined;
+  WishLists: undefined;
+  ForgotPassword: undefined;
 
   //<!--router-link-admin-Export-->
 };
@@ -170,9 +179,10 @@ const App = (): React.JSX.Element => {
             <NavigationContainer>
               <Stack.Navigator
                 screenOptions={{headerShown: false}}
-                initialRouteName="HomesHome">
+                initialRouteName="LoginPage">
                 {/* <!--router-link-admin--> */}
                 {/* <Stack.Screen name="RemoteNotification" component={RemoteNotification} /> */}
+                <Stack.Screen name="LoginPage" component={LoginPage} />
                 <Stack.Screen name="AboutHomes" component={AboutHomes} />
                 <Stack.Screen
                   name="IndustriesList"
@@ -195,6 +205,13 @@ const App = (): React.JSX.Element => {
                 />
                 <Stack.Screen name="CareersHome" component={CareersHome} />
                 <Stack.Screen name="ContactsHome" component={ContactsHome} />
+                <Stack.Screen name="CartsList" component={CartsList} />
+                <Stack.Screen name="WishLists" component={WishLists} />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
+                />
+                <Stack.Screen name="AppUserEdit" component={AppUserEdit} />
                 <Stack.Screen
                   name="OurClientsHome"
                   component={OurClientsHome}

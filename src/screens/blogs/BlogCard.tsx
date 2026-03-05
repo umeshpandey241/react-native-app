@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowOffset: {width: 0, height: 4},
+    flex: 1,
   },
 
   imageWrapper: {
@@ -131,8 +132,9 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 14,
+    flex: 1,
+    justifyContent: 'space-between',
   },
-
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

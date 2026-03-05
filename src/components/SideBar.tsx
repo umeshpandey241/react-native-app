@@ -56,6 +56,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
   const [isIndustryCollapsed, setIsIndustryCollapsed] = useState(true);
   const [isResourseCollapsed, setIsResourseCollapsed] = useState(true);
   const [isIndustriesCollapsed, setIsIndustriesCollapsed] = useState(true);
+  const [isMedsCollapsed, setIsMedsCollapsed] = useState(true);
   const [activeButton, setActiveButton] = useState<string | null>(null);
   const [openSearchBox, setOpenSearchBox] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -149,7 +150,9 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
   const resourcesOptions = [
     {label: 'Blogs', value: 'BlogList'},
     {label: 'Events', value: 'EventList'},
-    {label: 'Case Study', value: 'CaseStudiesList'},
+    {label: 'Cart', value: 'CartsList'},
+    {label: 'WishList', value: 'WishLists'},
+    // {label: 'Case Study', value: 'CaseStudiesList'},
   ];
 
   const handleButtonPress = (buttonName: string, action: () => void) => {
@@ -304,6 +307,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                           onPress={() => {
                             navigation.navigate('ProductView', {
                               slug: item.slug,
+                              id: item.id,
                             });
                           }}
                           style={[
@@ -411,9 +415,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                     </TouchableOpacity>
                     <Collapsible
                       collapsed={isIndustriesCollapsed}
-                      style={[
-                        activeButton === 'Product' && styles.activeButton,
-                      ]}>
+                      style={[activeButton === 'Food' && styles.activeButton]}>
                       {navData?.foodBeverages
                         ?.slice()
                         ?.sort((a: any, b: any) => a.name.localeCompare(b.name))
@@ -449,10 +451,11 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                           );
                         })}
                     </Collapsible>
+
                     <TouchableOpacity
                       onPress={() => {
                         handleButtonPress('Meds', () =>
-                          setIsIndustriesCollapsed(!isIndustriesCollapsed),
+                          setIsMedsCollapsed(!isMedsCollapsed),
                         );
                       }}
                       style={[
@@ -491,7 +494,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                       </View>
                     </TouchableOpacity>
                     <Collapsible
-                      collapsed={isIndustriesCollapsed}
+                      collapsed={isMedsCollapsed}
                       style={[activeButton === 'Meds' && styles.activeButton]}>
                       {navData?.pharmaceuticals
                         ?.slice()
@@ -604,11 +607,11 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
 
                   <TouchableOpacity
                     onPress={() =>
-                      handleNavigationWithActive('CareersHome', 'Career')
+                      handleNavigationWithActive('AppUserEdit', 'AppUserEdit')
                     }
                     style={[
                       styles.menu,
-                      activeButton === 'Career' && styles.activeButton,
+                      activeButton === 'AppUserEdit' && styles.activeButton,
                     ]}>
                     <View style={{flexDirection: 'row'}}>
                       <MaterialCommunityIcons
@@ -616,7 +619,7 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
                         size={24}
                         style={styles.primaryColor}
                       />
-                      <Text style={styles.menuItem}>Career</Text>
+                      <Text style={styles.menuItem}>Edit</Text>
                     </View>
                   </TouchableOpacity>
 
@@ -786,9 +789,8 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
         visible={enquiryFormOpen}
         transparent
         animationType="fade"
-        onRequestClose={() => {}} // prevent Android back close
-      >
-        {/* Overlay */}
+        statusBarTranslucent
+        onRequestClose={() => {}}>
         <View style={styles.overlay}>
           <View style={styles.modal}>
             {/* Header */}
@@ -796,11 +798,12 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
               <Text style={styles.title}>Enquiry Details</Text>
             </View>
 
-            {/* Body (scrollable) */}
+            {/* Body */}
             <ScrollView
               style={styles.body}
-              contentContainerStyle={{paddingBottom: 20}}
-              showsVerticalScrollIndicator={false}>
+              contentContainerStyle={styles.bodyContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled">
               <EnquiryForm
                 setEnquiryFormOpen={setEnquiryFormOpen}
                 products={products}
@@ -808,20 +811,8 @@ const Sidebar = ({isVisible, onClose}: SidebarProps) => {
               />
             </ScrollView>
 
-            {/* Footer */}
-            <View style={styles.footer}>
-              {/* <TouchableOpacity
-                                onPress={handleSubmit}
-                                style={styles.primaryButton}>
-                                <Text style={styles.buttonText}>Submit</Text>
-                              </TouchableOpacity>
-                 */}
-              <TouchableOpacity
-                onPress={() => setEnquiryFormOpen(false)}
-                style={styles.primaryButton}>
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Footer (optional) */}
+            <View style={styles.footer} />
           </View>
         </View>
       </Modal>

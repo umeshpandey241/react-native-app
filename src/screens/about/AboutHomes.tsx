@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Dimensions,
   ScrollView,
   Pressable,
+  // FlatList,
+  Modal,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -23,6 +25,9 @@ import Footer from '../../components/Footer';
 import {ResearchDevelopment} from '../../core/model/researchDevelopment';
 import {Leadership} from '../../core/model/leadership';
 import {OurVideo} from '../../core/model/ourVideo';
+import ImageViewing from 'react-native-image-viewing';
+// import WebView from 'react-native-webview';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 export interface CustomFile {
   fileName: string;
@@ -52,8 +57,10 @@ export const getYouTubeId = (url: string) => {
   return id;
 };
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
+const GAP = 12;
+const CARD_WIDTH = (width - 48 - GAP) / 2; // padding + gap
 // const CARD_WIDTH = IS_TABLET ? 300 : 260;
 
 export default function AboutSection() {
@@ -64,6 +71,8 @@ export default function AboutSection() {
   const [research, setResearch] = useState<ResearchDevelopment[]>([]);
   const [team, setTeam] = useState<Leadership[]>([]);
   const [video, setVideo] = useState<OurVideo[]>([]);
+  const [videoOpen, setVideoOpen] = useState(false);
+
   const ripple1 = useRef(new Animated.Value(0)).current;
   const ripple2 = useRef(new Animated.Value(0)).current;
   const ripple3 = useRef(new Animated.Value(0)).current;
@@ -120,6 +129,8 @@ export default function AboutSection() {
     showList.includes(item?.name?.toLowerCase() || ''),
   );
   const videoId = getYouTubeId(videoData[0]?.videoLink || '');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  // const sliderRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,9 +148,19 @@ export default function AboutSection() {
     fetchTeamsData();
   }, []);
 
-  const images = research
-    .map(item => getPhotoUrl(item.uploadPhoto))
-    .filter(Boolean);
+  const images = useMemo(
+    () =>
+      research
+        .map(item => getPhotoUrl(item.uploadPhoto))
+        .filter((url): url is string => typeof url === 'string'),
+    [research],
+  );
+
+  const viewerImages = useMemo(() => images.map(uri => ({uri})), [images]);
+
+  const openImage = (index: number) => {
+    setActiveIndex(index);
+  };
 
   const teamImages = team
     .map(item => getPhotoUrl(item.uploadPhoto))
@@ -465,14 +486,16 @@ export default function AboutSection() {
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.gallerysection}>
           {/* HEADER */}
-          <View style={styles.header}>
-            <Text style={styles.badge}>IGNITING THE SPARK OF DISCOVERY</Text>
+          <View style={styles.galleryheader}>
+            <Text style={styles.gallerybadge}>
+              IGNITING THE SPARK OF DISCOVERY
+            </Text>
 
-            <Text style={styles.title}>Research & Development</Text>
+            <Text style={styles.gallerytitle}>Research & Development</Text>
 
-            <Text style={styles.subtitle}>
+            <Text style={styles.gallerysubtitle}>
               Experience reliable filtration, personalized solutions, and expert
               support—trusted by industry leaders for quality, compliance, and
               long-term partnership.
@@ -481,12 +504,22 @@ export default function AboutSection() {
 
           {/* GRID */}
           {images.length > 0 && (
-            <View style={styles.gallery}>
+            <View style={styles.gallerygallery}>
               {images.map((item, index) => (
-                <Pressable key={index} style={styles.imageCard}>
+                <Pressable
+                  key={index}
+                  onPress={() => openImage(index)}
+                  style={[
+                    styles.imageCard,
+                    index === 0 || index === 1
+                      ? styles.imageTall
+                      : index === 5
+                      ? styles.imageExtraTall
+                      : styles.imageSmall,
+                  ]}>
                   <Image
                     source={{uri: item}}
-                    style={styles.image1}
+                    style={styles.galleryimage}
                     resizeMode="cover"
                   />
                 </Pressable>
@@ -495,10 +528,10 @@ export default function AboutSection() {
           )}
 
           {/* CTA */}
-          <View style={styles.ctaWrapper}>
+          <View style={styles.galleryctaWrapper}>
             {/* <Pressable style={styles.ctaButton} onPress={onViewAll}> */}
-            <Pressable style={styles.ctaButton}>
-              <Text style={styles.ctaText}>View All</Text>
+            <Pressable style={styles.galleryctaButton}>
+              <Text style={styles.galleryctaText}>View All</Text>
             </Pressable>
           </View>
         </View>
@@ -573,8 +606,9 @@ export default function AboutSection() {
             </Text>
 
             {videoId && (
-              // <Pressable onPress={onPlay} style={styles.playWrap}>
-              <Pressable style={styles.playWrap}>
+              <Pressable
+                style={styles.playWrap}
+                onPress={() => setVideoOpen(true)}>
                 {/* Ripples */}
                 <Animated.View style={[styles.ripple, rippleStyle(ripple1)]} />
                 <Animated.View style={[styles.ripple, rippleStyle(ripple2)]} />
@@ -582,7 +616,11 @@ export default function AboutSection() {
 
                 {/* Button */}
                 <View style={styles.playBtn}>
-                  <Ionicons name="play" size={28} color="#0D6EFD" />
+                  <MaterialCommunityIcons
+                    name="play"
+                    size={28}
+                    color="#0D6EFD"
+                  />
                 </View>
               </Pressable>
             )}
@@ -591,6 +629,43 @@ export default function AboutSection() {
         </View>
       </ScrollView>
       <Footer />
+
+      <ImageViewing
+        images={viewerImages}
+        imageIndex={activeIndex}
+        visible={activeIndex >= 0}
+        onRequestClose={() => setActiveIndex(-1)}
+      />
+
+      <Modal
+        visible={videoOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => {}}>
+        <View style={styles.videoModalOverlay}>
+          <View style={styles.videoModalContent}>
+            {/* CLOSE BUTTON */}
+            <Pressable
+              style={styles.videoCloseBtn}
+              onPress={() => setVideoOpen(false)}>
+              <MaterialCommunityIcons name="close" size={22} color="#fff" />
+            </Pressable>
+
+            {/* YOUTUBE PLAYER */}
+            <View style={styles.videoContainer}>
+              {/* <WebView
+                source={{
+                  uri: `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`,
+                }}
+                javaScriptEnabled
+                allowsFullscreenVideo
+                mediaPlaybackRequiresUserAction={false}
+              /> */}
+              <YoutubePlayer height={200} play={true} videoId={videoId} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -599,6 +674,7 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: '#EAF6FF',
     paddingVertical: 40,
+    paddingHorizontal: 32,
   },
 
   header: {
@@ -1040,5 +1116,144 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 24,
     color: '#666',
+  },
+
+  gallerysection: {
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+    backgroundColor: '#fff',
+  },
+
+  galleryheader: {
+    alignItems: 'center',
+    marginBottom: 28,
+  },
+
+  gallerybadge: {
+    fontSize: 11,
+    letterSpacing: 1.4,
+    color: '#6b6b6b',
+    marginBottom: 8,
+  },
+
+  gallerytitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: '#111',
+  },
+
+  gallerysubtitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#666',
+    textAlign: 'center',
+    maxWidth: 300,
+  },
+
+  /* ===== GALLERY ===== */
+  gallerygallery: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: GAP,
+  },
+
+  galleryimageCard: {
+    width: CARD_WIDTH,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#eee',
+  },
+
+  imageTall: {
+    height: 230,
+  },
+
+  imageExtraTall: {
+    height: 260,
+  },
+
+  imageSmall: {
+    height: 150,
+  },
+
+  galleryimage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  /* ===== CTA ===== */
+  galleryctaWrapper: {
+    marginTop: 28,
+    alignItems: 'center',
+  },
+
+  galleryctaButton: {
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+
+  galleryctaText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+
+  closeBtn: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+
+  fullImageWrapper: {
+    width,
+    height,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  fullImage: {
+    width,
+    // height,
+  },
+  videoModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  videoModalContent: {
+    width: '96%',
+    maxWidth: 1000,
+    backgroundColor: '#EAF6FF', // primary-light
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+
+  videoCloseBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  videoContainer: {
+    width: '100%',
+    height: height * 0.6, // same as 50–70vh logic
   },
 });

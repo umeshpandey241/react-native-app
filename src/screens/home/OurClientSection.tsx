@@ -12,9 +12,13 @@ import {
 // import LinearGradient from 'react-native-linear-gradient';
 import {OurClient} from '../../core/model/ourClient';
 import {getPhotoUrl} from '../product/ProductList';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
+
+type RootStackParamList = {
+  OurClientsHome: undefined;
+};
 
 type Props = {
   ourClientsData: OurClient[];
@@ -24,7 +28,7 @@ export default function OurClientSection({ourClientsData}: Props) {
   const filteredByActive = ourClientsData?.filter(
     item => item.isActive === true,
   );
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const repeatedClients = Array(4).fill(filteredByActive).flat();
 
@@ -95,20 +99,21 @@ export default function OurClientSection({ourClientsData}: Props) {
 }
 
 const styles = StyleSheet.create({
-  section: {
+  content: {
     width: '100%',
+    // height: 600,
     paddingVertical: 40,
-    backgroundColor: '#6366f1', // tertiary fallback
+    backgroundColor: '#6366f1',
   },
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
   },
 
-  content: {
-    zIndex: 2,
-    backgroundColor: '#6366f1',
-  },
+  // content: {
+  //   zIndex: 2,
+  //   backgroundColor: '#6366f1',
+  // },
 
   header: {
     paddingHorizontal: 16,

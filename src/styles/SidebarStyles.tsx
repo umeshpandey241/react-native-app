@@ -14,21 +14,15 @@ export const SidebarStyles = () => {
       // justifyContent: 'flex-start',
     },
     sidebar: {
-      backgroundColor: theme.background,
-      borderColor: theme.border,
       width: width * 0.7,
-      // width: '70%',
       height: '100%',
-      padding: 10,
+      backgroundColor: theme.background,
       position: 'absolute',
       left: 0,
       top: 0,
       bottom: 0,
-      shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.5,
-      shadowRadius: 4,
-      elevation: 5,
+      padding: 10,
+      elevation: 10,
     },
     menuRow: {
       flexDirection: 'row',
@@ -228,48 +222,6 @@ export const SidebarStyles = () => {
       fontSize: 14,
     },
 
-    overlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'flex-end',
-    },
-
-    modal: {
-      backgroundColor: '#ffffff',
-      width: '100%',
-      maxHeight: '95%',
-      borderTopLeftRadius: 16,
-      borderTopRightRadius: 16,
-      overflow: 'hidden',
-    },
-
-    header: {
-      borderBottomWidth: 1,
-      borderColor: 'var(--color-border)',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-    },
-
-    title: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: 'var(--color-primary)',
-    },
-
-    body: {
-      maxHeight: '70%',
-      paddingHorizontal: 16,
-      paddingTop: 12,
-    },
-
-    footer: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      gap: 12,
-      padding: 16,
-      borderTopWidth: 1,
-      borderColor: 'var(--color-border)',
-    },
     primaryButton: {
       backgroundColor: '#0b6fae',
       paddingHorizontal: 18,
@@ -281,6 +233,58 @@ export const SidebarStyles = () => {
       color: '#fff',
       fontSize: 14,
       fontWeight: '600',
+    },
+
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    modal: {
+      width: '100%',
+      maxWidth: 520, // 🔥 desktop / tablet friendly
+      maxHeight: '85%', // prevents overflow
+      backgroundColor: '#ffffff',
+      borderRadius: 20,
+      overflow: 'hidden',
+
+      // Shadow (iOS)
+      shadowColor: '#000',
+      shadowOpacity: 0.25,
+      shadowRadius: 12,
+      shadowOffset: {width: 0, height: 8},
+
+      // Elevation (Android)
+      elevation: 10,
+    },
+
+    header: {
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#e5e7eb',
+      backgroundColor: '#f9fafb',
+    },
+
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: '#111827',
+      textAlign: 'center',
+    },
+
+    body: {
+      flexGrow: 0,
+    },
+
+    bodyContent: {
+      padding: 20,
+    },
+
+    footer: {
+      padding: 16,
+      borderTopWidth: 1,
+      borderTopColor: '#e5e7eb',
+      backgroundColor: '#f9fafb',
     },
   });
 };

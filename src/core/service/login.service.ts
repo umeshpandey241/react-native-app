@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {getAuthHeaders} from '@/lib/getHeaders';
-import {useLanguageStore} from '@/store/useLanguage.store';
-import {LoginPayload, LoginResponse} from '@/types/auth';
+
+import {LoginPayload, LoginResponse} from '../../types/auth';
+import {BASE_URL} from '../../../config/config';
 
 const loginUser = async (
   payload: LoginPayload,
@@ -92,16 +92,12 @@ const ValidateEmail = async (
   }
 };
 
-const loginByEmail = async (emailId?: any, token?: any): Promise<any> => {
+const loginByEmail = async (emailId?: any): Promise<any> => {
   const payload = {emailId: emailId};
 
   try {
     const response = await fetch(`${BASE_URL}/Login/LoginEmail`, {
       method: 'POST',
-      headers: getAuthHeaders(
-        token,
-        useLanguageStore.getState().selectedLanguage,
-      ),
       body: JSON.stringify(payload),
     });
 

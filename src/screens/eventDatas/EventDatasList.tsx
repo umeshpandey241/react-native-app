@@ -227,6 +227,7 @@ export default EventDatasList;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // 🔥 REQUIRED
     padding: 16,
     backgroundColor: '#eef5fb',
   },

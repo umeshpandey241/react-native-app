@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {getPhotoUrl} from '../industries/IndustriesList';
 import {Testimonial} from '../../core/model/testimonial';
+import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
 
 const {width} = Dimensions.get('window');
 const IS_TABLET = width >= 768;
@@ -38,6 +39,7 @@ export default function TestimonialSection({
 
   const renderItem = ({item}: {item: Testimonial}) => {
     const imageUrl = getPhotoUrl(item.uploadPhoto);
+    console.log(item.rating, typeof item.rating);
 
     return (
       <View style={styles.card}>
@@ -46,11 +48,10 @@ export default function TestimonialSection({
           {/* STARS */}
           <View style={styles.stars}>
             {Array.from({length: 5}).map((_, i) => (
-              <Ionicons
-                key={i}
+              <MaterialCommunityIcons
                 name={i < item.rating ? 'star' : 'star-outline'}
-                size={20}
-                color="#006699"
+                size={18}
+                color="#180495"
               />
             ))}
           </View>
@@ -130,7 +131,11 @@ export default function TestimonialSection({
               });
               setActiveIndex(prev);
             }}>
-            <Ionicons name="chevron-back" size={22} color="#006699" />
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={22}
+              color="#006699"
+            />
           </Pressable>
 
           <Pressable
@@ -146,7 +151,11 @@ export default function TestimonialSection({
               });
               setActiveIndex(next);
             }}>
-            <Ionicons name="chevron-forward" size={22} color="#006699" />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={22}
+              color="#006699"
+            />
           </Pressable>
         </>
       )}

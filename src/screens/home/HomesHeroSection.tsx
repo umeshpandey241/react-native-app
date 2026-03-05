@@ -60,10 +60,48 @@ export default function HomesHeroSection({
       setCurrent(prev => (prev + 1) % slideCount);
     }, 5000);
 
-    return () => timerRef.current && clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [slideCount, opacity]);
 
   if (slideCount === 0) return null;
+
+  const handleNext = () => {
+    Animated.sequence([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setCurrent(prev => (prev + 1) % slideCount);
+  };
+
+  const handlePrevious = () => {
+    Animated.sequence([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setCurrent(prev => (prev - 1 + slideCount) % slideCount);
+  };
 
   return (
     <View style={styles.container}>
@@ -111,7 +149,19 @@ export default function HomesHeroSection({
         ))}
       </View>
 
-      {/* Video Modal */}
+      {/* Navigation Buttons */}
+      {slideCount > 1 && (
+        <View style={styles.navButtons}>
+          <TouchableOpacity style={styles.navBtn} onPress={handlePrevious}>
+            <Text style={styles.navText}>‹</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.navBtn} onPress={handleNext}>
+            <Text style={styles.navText}>›</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <Modal visible={videoOpen} animationType="slide">
         <TouchableOpacity
           style={styles.close}
@@ -217,5 +267,27 @@ const styles = StyleSheet.create({
     top: 40,
     right: 20,
     zIndex: 10,
+  },
+  navButtons: {
+    position: 'absolute',
+    bottom: 12,
+    right: 20,
+    flexDirection: 'row',
+    gap: 10,
+  },
+
+  navBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  navText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
   },
 });

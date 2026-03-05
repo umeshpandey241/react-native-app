@@ -603,11 +603,11 @@ function EnquiryForm({
         </TouchableOpacity>
 
         {/* Close */}
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => setEnquiryFormOpen(false)}
           style={styles.actionButton}>
           <Text style={styles.actionText}>Close</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

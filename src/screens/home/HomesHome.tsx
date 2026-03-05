@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import React, {useEffect} from 'react';
 import {Banner} from '../../core/model/banner';
 import {Industrie} from '../../core/model/industrie';
@@ -29,6 +29,12 @@ import BlogsSection from './BlogsSection';
 import Header from '../../components/Header';
 import NewsletterSection from './NewsletterSection';
 import Footer from '../../components/Footer';
+
+const styles = StyleSheet.create({
+  gradientBackground: {
+    backgroundColor: '#f0f8ff',
+  },
+});
 
 const HomesHome = () => {
   const [bannerData, setBannerData] = React.useState<Banner[]>([]);
@@ -134,7 +140,7 @@ const HomesHome = () => {
         />
         <ProductsSection productsData={productsData} />
         <OurClientSection ourClientsData={ourClientsData} />
-        <View style={{background: 'var(--white-blue-gradient)'}}>
+        <View style={styles.gradientBackground}>
           <TestimonialSection testimonialData={testimonialData} />
         </View>
         <BlogsSection blogsData={blogsData} />

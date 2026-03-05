@@ -12,6 +12,7 @@ import {
   Pressable,
   Dimensions,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {MaterialCommunityIcons} from '../../sharedBase/globalImport';
@@ -116,7 +117,7 @@ const BlogView = () => {
                 <Pressable
                   key={i}
                   onPress={() =>
-                    navigation.navigate('BlogDetails', {slug: post.slug})
+                    navigation.navigate('BlogView', {slug: post.slug})
                   }
                   style={styles.recentPost}>
                   {post.image ? (
@@ -151,7 +152,11 @@ const BlogView = () => {
                 <Pressable
                   key={i}
                   onPress={() =>
-                    navigation.navigate('Blogs', {category: cat.name})
+                    Linking.openURL(
+                      `https://niran.wazl.in/blogs?category=${encodeURIComponent(
+                        cat.name,
+                      )}`,
+                    )
                   }
                   style={styles.categoryRow}>
                   <Text style={styles.categoryName}>{cat.name}</Text>

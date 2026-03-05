@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   Pressable,
+  SafeAreaView,
   // Dimensions,
 } from 'react-native';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -68,88 +69,92 @@ const OurClientsHome = () => {
 
   return (
     <>
-      <Header Heading="Client" />
-      <View style={styles.container}>
-        {/* Heading */}
-        <Text style={styles.heading}>Our Clients</Text>
+      <SafeAreaView style={{flex: 1}}>
+        <Header Heading="Client" />
+        <View style={styles.container}>
+          {/* Heading */}
+          <Text style={styles.heading}>Our Clients</Text>
 
-        <Text style={styles.description}>
-          NIRAN partners with top organizations across food, pharma, water, and
-          more—delivering proven filtration solutions that drive success and
-          lasting relationships.
-        </Text>
+          <Text style={styles.description}>
+            NIRAN partners with top organizations across food, pharma, water,
+            and more—delivering proven filtration solutions that drive success
+            and lasting relationships.
+          </Text>
 
-        {/* Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContainer}>
-          <Pressable
-            onPress={() => setActiveTab('All')}
-            style={[styles.tab, activeTab === 'All' && styles.activeTab]}>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'All' && styles.activeTabText,
-              ]}>
-              All
-            </Text>
-          </Pressable>
-
-          {activeClientCategoriesData?.map(category => (
+          {/* Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContainer}>
             <Pressable
-              key={category.id}
-              onPress={() => setActiveTab(category.name ?? '')}
-              style={[
-                styles.tab,
-                activeTab === category.name && styles.activeTab,
-              ]}>
+              onPress={() => setActiveTab('All')}
+              style={[styles.tab, activeTab === 'All' && styles.activeTab]}>
               <Text
                 style={[
                   styles.tabText,
-                  activeTab === category.name && styles.activeTabText,
+                  activeTab === 'All' && styles.activeTabText,
                 ]}>
-                {category.name}
+                All
               </Text>
             </Pressable>
-          ))}
-        </ScrollView>
 
-        {/* Clients Grid */}
-        {filteredOurClientsData?.length ? (
-          <FlatList
-            data={filteredOurClientsData}
-            keyExtractor={item => item.id.toString()}
-            numColumns={4}
-            columnWrapperStyle={styles.gridRow}
-            contentContainerStyle={styles.grid}
-            renderItem={({item}) => {
-              const imageUrl = getPhotoUrl(item.image);
-              return (
-                <View style={styles.clientCard}>
-                  {imageUrl ? (
-                    <Image
-                      source={{uri: imageUrl}}
-                      style={styles.clientImage}
-                      resizeMode="contain"
-                    />
-                  ) : (
-                    <View style={styles.noImage}>
-                      <Text style={styles.noImageText}>No Image</Text>
-                    </View>
-                  )}
-                </View>
-              );
-            }}
-          />
-        ) : (
-          <Text style={styles.emptyText}>
-            No Clients available for category:{' '}
-            <Text style={styles.emptyHighlight}>{activeTab}</Text>
-          </Text>
-        )}
-      </View>
-      <Footer />
+            {activeClientCategoriesData?.map(category => (
+              <Pressable
+                key={category.id}
+                onPress={() => setActiveTab(category.name ?? '')}
+                style={[
+                  styles.tab,
+                  activeTab === category.name && styles.activeTab,
+                ]}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === category.name && styles.activeTabText,
+                  ]}>
+                  {category.name}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          {/* Clients Grid */}
+          {filteredOurClientsData?.length ? (
+            <FlatList
+              data={filteredOurClientsData}
+              keyExtractor={item => item.id.toString()}
+              numColumns={4}
+              columnWrapperStyle={styles.gridRow}
+              contentContainerStyle={styles.grid}
+              showsVerticalScrollIndicator={false}
+              ListFooterComponent={<View style={{height: 100}} />} // 🔥 KEY FIX
+              renderItem={({item}) => {
+                const imageUrl = getPhotoUrl(item.image);
+                return (
+                  <View style={styles.clientCard}>
+                    {imageUrl ? (
+                      <Image
+                        source={{uri: imageUrl}}
+                        style={styles.clientImage}
+                        resizeMode="contain"
+                      />
+                    ) : (
+                      <View style={styles.noImage}>
+                        <Text style={styles.noImageText}>No Image</Text>
+                      </View>
+                    )}
+                  </View>
+                );
+              }}
+            />
+          ) : (
+            <Text style={styles.emptyText}>
+              No Clients available for category:{' '}
+              <Text style={styles.emptyHighlight}>{activeTab}</Text>
+            </Text>
+          )}
+        </View>
+        <Footer />
+      </SafeAreaView>
     </>
   );
 };
@@ -158,6 +163,7 @@ export default OurClientsHome;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // 🔥 IMPORTANT
     paddingVertical: 32,
     paddingHorizontal: 16,
     backgroundColor: '#f4f8fc',
@@ -177,20 +183,23 @@ const styles = StyleSheet.create({
     color: '#425466',
     marginBottom: 24,
   },
-
   tabsContainer: {
+    flexDirection: 'row',
+    // alignItems: 'center',
     gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
+    // paddingVertical: 10,
+    // paddingHorizontal: 4,
   },
 
   tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 50,
-    backgroundColor: '#eaf1f8',
+    height: 44,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    backgroundColor: '#eef5fb',
     borderWidth: 1,
-    borderColor: '#d0d7de',
+    borderColor: '#d5dee8',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   activeTab: {
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
   },
 
   grid: {
-    paddingTop: 20,
+    // paddingTop: 20,
   },
 
   gridRow: {
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
   clientCard: {
     width: '23%',
     aspectRatio: 1,
-    padding: 12,
+    // padding: 12,
     borderRadius: 14,
     backgroundColor: 'rgba(255,255,255,0.4)',
     borderWidth: 1,

@@ -18,7 +18,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {getPhotoUrl} from './ProductList';
 import {CustomFile} from '../about/AboutHomes';
 import {BASE_URL} from '../../../config/config';
@@ -95,8 +95,9 @@ export const safeParse = (value: any) => {
   }
 };
 
-const ProductView = ({route}) => {
-  const {slug, id} = route.params || {};
+const ProductView = () => {
+  const route = useRoute();
+  const {slug, id}: any = route.params || {};
   const [productData, setProductData] = useState<productData>({});
   const [otherProductData, setOtherProductData] = useState<Product[]>([]);
   console.log(productData, 'product');
